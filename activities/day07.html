@@ -1,0 +1,812 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.17.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<script>
+class AnchorNoProxy extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._$a = null;
+  }
+  connectedCallback() {
+    const href = this.getAttribute("href") || "#";
+    if (this.dataset.hasOwnProperty('canvas')) {
+        const canvasURL = this.dataset.canvas;
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}" data-canvas="${canvasURL}"><slot></slot></a>`;
+    } else {
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}"><slot></slot></a>`;
+    }
+    this._$a = this.shadowRoot.querySelector("a");
+    this._$a.addEventListener("click", e => {
+      var url = this.getAttribute('href');
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+        window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+        window.open(url, '_blank');
+      }
+    });
+  }
+  static get observedAttributes() { return ["href"]; }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      if (this._$a === null) return;
+      this._$a.setAttribute("href", newValue);
+    }
+  }
+}
+
+customElements.define("a-no-proxy", AnchorNoProxy);
+
+class NoProxy extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+      	window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+      	window.open(this.href, '_blank');
+      }
+    });
+  }
+}
+
+customElements.define("no-proxy", NoProxy, { extends: "a" });
+
+class ConfirmLink extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      const result = confirm(`Are you sure you want to go to '${this.href}'?`);
+      if (!result) e.preventDefault();
+    });
+  }
+}
+
+customElements.define("confirm-link", ConfirmLink, { extends: "a" });
+
+</script>
+
+<!-- begin _includes/seo.html --><title>Day 7: Building Towards Autodifferentiation - Machine Learning Spring 2026 @ Olin College</title>
+<meta name="description" content="Website">
+
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Machine Learning Spring 2026 @ Olin College">
+<meta property="og:title" content="Day 7: Building Towards Autodifferentiation">
+<meta property="og:url" content="/activities/day07.html">
+
+
+  <meta property="og:description" content="Website">
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="canonical" href="/activities/day07.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Machine Learning Spring 2026 @ Olin College Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  // Render Mermaid first, from untouched source.
+  mermaid.initialize({ startOnLoad: false });
+  await mermaid.run(); // renders all .mermaid blocks
+
+  // render KaTeX
+  renderMathInElement(document.body, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+    throwOnError: false,
+  });
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showSolutions = urlParams.get('showSolutions');
+    const showAllSolutions = urlParams.get('showAllSolutions');
+    const divs = document.querySelectorAll('button.togglebutton');
+
+    if (showSolutions == 'true') {
+        // Loop through the selected divs and manipulate them
+        divs.forEach(div => {
+            div.removeAttribute('hidden');
+        });
+    }
+
+    const solutionDivs = document.querySelectorAll('[id^=solution]');
+    const subpartSolutionDivs = document.querySelectorAll('[id^=subpartsolution]');
+
+    if (showAllSolutions == 'true') {
+        solutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+
+        subpartSolutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+    }
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<style>
+:root {
+    --box-bg-color: #fff; /* Default background color */
+}
+
+.homework-box {
+    background-color: var(--box-bg-color);
+    border: 2px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+}
+
+.homework-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.homework-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* Handle missing or empty src attribute */
+.homework-icon[src=""],
+.homework-icon:not([src]) {
+    content: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Games_for_Learning_%2827470%29_-_The_Noun_Project.svg');
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.homework-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.homework-content {
+    font-size: 16px;
+    color: #333;
+}
+</style>
+
+<style>
+.solution {
+    display: none; /* Hide solutions by default */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-left: 4px solid #007bff;
+    margin-top: 10px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.toggle-button.hide-solution {
+    background-color: #dc3545; /* Red background for hide button */
+}
+
+img.mermaid {
+     max-width:500px;
+     text-align: center;
+}
+
+</style>
+
+<div style="display:none;">
+$
+\newcommand{\mlvec}[1]{\mathbf{#1}}
+\newcommand{\mlmat}[1]{\mathbf{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\DeclareMathOperator*{\argmin}{arg\,min\,}
+$
+</div>
+
+  </head>
+
+  <body class="layout--problemset">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="https://qeacourse.github.io/RoboNinjaWarrior/website_graphics/olinlogo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Machine Learning Spring 2026 @ Olin College
+          
+        </a>
+        <ul class="visible-links"></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Day 7: Building Towards Autodifferentiation">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Day 7: Building Towards Autodifferentiation
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+	      
+                <ul class="toc__menu">
+  <li><a href="#">Agenda</a></li>
+  <li><a href="#debrief">Debrief</a></li>
+  <li><a href="#preview-of-where-we-are-going">Preview of where we are going</a></li>
+  <li><a href="#buildings-towards-autodifferentiation">Buildings towards Autodifferentiation</a></li>
+  <li><a href="#thinking-through-autodifferentiation-in-python">Thinking Through Autodifferentiation in Python</a></li>
+</ul>
+	      	
+            </nav>
+          </aside>
+        
+        
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #4c00b0;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #FFFFFF;">
+        <i class="fas fa-list"></i>
+</div>
+	<h1 style="font-size: xx-large; font-weight: 900; color: white;">Agenda</h1>
+    </div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<ul>
+  <li>3:45-4:15pm: Debrief at tables and going over dataflow diagrams</li>
+  <li>4:15-4:30pm: Going Over Simplification in Logistic Regression Learning Rule</li>
+  <li>4:30-5:25pm: Foundations of Micrograd</li>
+</ul>
+
+	</div>
+</div>
+
+<h1 id="debrief">Debrief</h1>
+
+<ul>
+  <li>We think people may still be a bit fuzzy on data flow diagrams.  We’ll go over a quick example together as a class.</li>
+  <li>We also think people may be having trouble with simplifications in the logistic regression problem.  We’ll do a 
+quick overview.</li>
+</ul>
+
+<h1 id="preview-of-where-we-are-going">Preview of where we are going</h1>
+
+<p>We’ll go over the upcoming gate on model evaluation.  We’ll also talk about the COMPAS algorithm and the readings we will be doing / the discussions we will be having.</p>
+
+<h1 id="buildings-towards-autodifferentiation">Buildings towards Autodifferentiation</h1>
+
+<p>While you may still be having a bit of difficulty applying dataflow diagrams, hopefully the process is starting to become more mechanical.  In fact, given how mechanical it is, you may be wondering if there is a way to automate the process entirely.  Of course there is, and that’s where we are going to go next.  What we will be doing in assignment 7 (not this coming assignment but the next), is using the concepts of data flow diagrams to implement a system for automatically computing the gradient of any function!</p>
+
+<p>Next, we’ll go step-by-step through the process of going from dataflow diagrams to auto differentiation.</p>
+
+<h2 id="step-1-modify-our-dataflow-diagram-to-compute-gradients">Step 1: Modify our dataflow diagram to compute gradients</h2>
+
+<p>Let’s go back to our minimal example of a multivariable function that we used to first introduce the concept of dataflow diagrams.</p>
+
+<div class="mermaid">
+flowchart BT
+ id1["$$f = f(x,y)~~~~$$"]
+ id2["$$x = x(t)~~$$"]
+ id3["$$y = y(t)~~$$"]
+ id2 --&gt; id1
+ id3 --&gt; id1
+ t --&gt; id2
+ t --&gt; id3
+</div>
+
+<p>In order to compute $\frac{\partial f}{\partial t}$ we traced all possible paths from $t$ to $f$, multiplied the partial derivatives along the way, and then added up each of these paths.</p>
+
+\[\begin{aligned}
+\frac{\partial f}{\partial t} &amp;= \frac{\partial f}{\partial x} \frac{\partial x}{\partial t} +  \frac{\partial f}{\partial y} \frac{\partial y}{\partial t}
+\end{aligned}\]
+
+<p>This all seems well and good, but this approach is not quite as systematic as we might like and it suffers from some computational challenges.  Consider a more complex dataflow diagram in the next problem.</p>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 1</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<div class="mermaid">
+flowchart BT
+ id1["$$f = f(q,p)~~~~$$"]
+ id2["$$x = x(t)~~$$"]
+ id3["$$y = y(t)~~$$"]
+ id4["$$r = r(x, y)~~$$"]
+ id5["$$s = s(x, y)~~$$"]
+ id6["$$q = q(r, s)~~$$"]
+ id7["$$p = p(r, s)~~$$"]
+ id2 --&gt; id4
+ id2 --&gt; id5
+ id3 --&gt; id4
+ id3 --&gt; id5
+ id4 --&gt; id6
+ id4 --&gt; id7
+ id5 --&gt; id6
+ id5 --&gt; id7
+ id6 --&gt; id1
+ id7 --&gt; id1
+ t --&gt; id2
+ t --&gt; id3
+</div>
+
+<p>Use the data flow diagram method to compute $\frac{\partial{f}}{\partial t}$.  There will be quite a few terms, so 
+if you are finding that you are getting the idea (and this is getting repetitive), you can just move on.</p>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-1&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-1" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+<p>You can see that things are getting a bit out of hand.  If you started adding more layers, we would be in even more trouble.  At this point things might seem a bit hopeless, but there are a few observations we can make.</p>
+
+<ul>
+  <li>A lot of the paths from $t$ to $f$ go through the same parts of the dataflow diagram.</li>
+  <li>The procedure above is great for computing a symbolic expression to compute $\frac{\partial{f}}{\partial t}$, however, when optimizing a function, for example using gradient descent, all we care about is computing the gradient given some specific values of our parameters.</li>
+</ul>
+
+<p>Given these two observations we can modify our dataflow diagram to more efficiently compute the partial derivatives we need.  Let’s now return to our simpler case and see how we can modify it.  Before we provide this example, let’s state our assumptions and define some notation.</p>
+
+<ul>
+  <li>Assumption: We assume that already executed our original dataflow diagram.  That is, given $t$, we have computed $x, y, f$.</li>
+  <li>We are using the notation $grad_{v}$ to represent the evaluation of $\frac{\partial f}{\partial v}$ based on the values $t, x, y, f$ (that is, $grad_{v}$ will just be a number, not a symbolic expression).</li>
+  <li>When we write $\frac{\partial g}{\partial v}$ we think of this as the evaluation of the partial derivative of $g$ with respect to $v$ given the values $t, x, y, f$ (again, not a symoblic expression.  it is just a number).</li>
+</ul>
+
+<p>Given the above, let’s modify our dataflow diagram to more naturally compute our gradients.</p>
+
+<div class="mermaid">
+flowchart TB
+ id1["$$grad_f = 1 ~~~~$$"]
+ id2["$$grad_x = \frac{\partial f}{\partial x} grad_f~~$$"]
+ id3["$$grad_y = \frac{\partial f}{\partial y} grad_f~~$$"]
+ id4["$$grad_t = \frac{\partial x}{\partial t} grad_x + \frac{\partial y}{\partial t} grad_y~~~~~~$$"]
+ id1 --"$$\frac{\partial f}{\partial x} grad_f~~$$"--&gt; id2
+ id1 --"$$\frac{\partial f}{\partial y} grad_f~~$$"--&gt; id3
+ id2 --"$$\frac{\partial x}{\partial t} grad_x ~~$$"--&gt; id4
+ id3 --"$$\frac{\partial y}{\partial t} grad_y ~~$$"--&gt; id4
+</div>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 2</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Make sense of the example above.  Try to understand where the expression for $grad_f$ comes from.  If you think about the concept of a recursive function, what might you call this?  Look at the other expressions for the partial derivatives.  Make sure these jibe with the rules you learned for dataflow diagrams.</p>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-2&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-2" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+<p>Hopefully, this is making sense.  Let’s do a bigger example next.</p>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 3</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Convert the following dataflow diagram to efficiently compute $grad_v$ for $f, x, y, r, s, q, p$.  You should wind up with something similar to the previous example.</p>
+
+<div class="mermaid">
+flowchart BT
+ id1["$$f = f(q,p)~~~~$$"]
+ id2["$$x = x(t)~~$$"]
+ id3["$$y = y(t)~~$$"]
+ id4["$$r = r(x, y)~~$$"]
+ id5["$$s = s(x, y)~~$$"]
+ id6["$$q = q(r, s)~~$$"]
+ id7["$$p = p(r, s)~~$$"]
+ id2 --&gt; id4
+ id2 --&gt; id5
+ id3 --&gt; id4
+ id3 --&gt; id5
+ id4 --&gt; id6
+ id4 --&gt; id7
+ id5 --&gt; id6
+ id5 --&gt; id7
+ id6 --&gt; id1
+ id7 --&gt; id1
+ t --&gt; id2
+ t --&gt; id3
+</div>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-3&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-3" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>Excuse the lack of annotation of the arrows.  We can show you in class as we walk around.</p>
+
+<div class="mermaid">
+flowchart TB
+ id1["$$grad_f = 1 ~~~~$$"]
+ id2["$$grad_x = grad_r \frac{\partial r}{\partial x} + grad_s \frac{\partial s}{\partial x}~~$$"]
+ id3["$$grad_y = grad_r \frac{\partial r}{\partial y} + grad_s \frac{\partial s}{\partial y}~~~~$$"]
+ id4["$$grad_r = grad_q \frac{\partial q}{\partial r} + grad_p \frac{\partial p}{\partial r}~~$$"]
+ id5["$$grad_s = grad_q \frac{\partial q}{\partial s} + grad_p \frac{\partial p}{\partial s}~~$$"]
+ id6["$$grad_q = grad_f \frac{\partial f}{\partial q}~~$$"]
+ id7["$$grad_p = grad_f \frac{\partial f}{\partial p}~~$$"]
+ id8["$$grad_t = grad_x \frac{\partial x}{\partial t} + grad_y \frac{\partial y}{\partial t}~~~~$$"]
+ id4 --&gt; id2
+ id5 --&gt; id2
+ id4 --&gt; id3
+ id5 --&gt; id3
+ id6 --&gt; id4
+ id7 --&gt; id4
+ id6 --&gt; id5
+ id7 --&gt; id5
+ id1 --&gt; id6
+ id1 --&gt; id7
+ id2 --&gt; id8
+ id3 --&gt; id8
+</div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<h1 id="thinking-through-autodifferentiation-in-python">Thinking Through Autodifferentiation in Python</h1>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 4</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>On <a href="../assignments/assignment07/assignment07">assignment 7</a>, you will be implementing autodifferentation in Python 
+(using the exact procedure above). 
+We will guide you through a specific way to implement if (based on the micrograd framework by Andrej Karpathy).  If you have time though, you might think with your table about how to implement this algorithm.  You are probably not going to be able to get to the level of mapping our Python code, but you can think about the major building blocks you would need (e.g., you would need something to compute the forward pass through the dataflow diagram).</p>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-4&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-4" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2026 Machine Learning Spring 2026 @ Olin College.</div>
+
+      </footer>
+    </div>
+
+    <script src="/assets/js/copyCode.js"></script>
+
+
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,1167 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.17.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<script>
+class AnchorNoProxy extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._$a = null;
+  }
+  connectedCallback() {
+    const href = this.getAttribute("href") || "#";
+    if (this.dataset.hasOwnProperty('canvas')) {
+        const canvasURL = this.dataset.canvas;
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}" data-canvas="${canvasURL}"><slot></slot></a>`;
+    } else {
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}"><slot></slot></a>`;
+    }
+    this._$a = this.shadowRoot.querySelector("a");
+    this._$a.addEventListener("click", e => {
+      var url = this.getAttribute('href');
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+        window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+        window.open(url, '_blank');
+      }
+    });
+  }
+  static get observedAttributes() { return ["href"]; }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      if (this._$a === null) return;
+      this._$a.setAttribute("href", newValue);
+    }
+  }
+}
+
+customElements.define("a-no-proxy", AnchorNoProxy);
+
+class NoProxy extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+      	window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+      	window.open(this.href, '_blank');
+      }
+    });
+  }
+}
+
+customElements.define("no-proxy", NoProxy, { extends: "a" });
+
+class ConfirmLink extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      const result = confirm(`Are you sure you want to go to '${this.href}'?`);
+      if (!result) e.preventDefault();
+    });
+  }
+}
+
+customElements.define("confirm-link", ConfirmLink, { extends: "a" });
+
+</script>
+
+<!-- begin _includes/seo.html --><title>Assignment 5 - Machine Learning Spring 2026 @ Olin College</title>
+<meta name="description" content="Website">
+
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Machine Learning Spring 2026 @ Olin College">
+<meta property="og:title" content="Assignment 5">
+<meta property="og:url" content="/assignments/assignment05/assignment05.html">
+
+
+  <meta property="og:description" content="Website">
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="canonical" href="/assignments/assignment05/assignment05.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Machine Learning Spring 2026 @ Olin College Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  // Render Mermaid first, from untouched source.
+  mermaid.initialize({ startOnLoad: false });
+  await mermaid.run(); // renders all .mermaid blocks
+
+  // render KaTeX
+  renderMathInElement(document.body, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+    throwOnError: false,
+  });
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showSolutions = urlParams.get('showSolutions');
+    const showAllSolutions = urlParams.get('showAllSolutions');
+    const divs = document.querySelectorAll('button.togglebutton');
+
+    if (showSolutions == 'true') {
+        // Loop through the selected divs and manipulate them
+        divs.forEach(div => {
+            div.removeAttribute('hidden');
+        });
+    }
+
+    const solutionDivs = document.querySelectorAll('[id^=solution]');
+    const subpartSolutionDivs = document.querySelectorAll('[id^=subpartsolution]');
+
+    if (showAllSolutions == 'true') {
+        solutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+
+        subpartSolutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+    }
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<style>
+:root {
+    --box-bg-color: #fff; /* Default background color */
+}
+
+.homework-box {
+    background-color: var(--box-bg-color);
+    border: 2px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+}
+
+.homework-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.homework-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* Handle missing or empty src attribute */
+.homework-icon[src=""],
+.homework-icon:not([src]) {
+    content: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Games_for_Learning_%2827470%29_-_The_Noun_Project.svg');
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.homework-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.homework-content {
+    font-size: 16px;
+    color: #333;
+}
+</style>
+
+<style>
+.solution {
+    display: none; /* Hide solutions by default */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-left: 4px solid #007bff;
+    margin-top: 10px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.toggle-button.hide-solution {
+    background-color: #dc3545; /* Red background for hide button */
+}
+
+img.mermaid {
+     max-width:500px;
+     text-align: center;
+}
+
+</style>
+
+<div style="display:none;">
+$
+\newcommand{\mlvec}[1]{\mathbf{#1}}
+\newcommand{\mlmat}[1]{\mathbf{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\DeclareMathOperator*{\argmin}{arg\,min\,}
+$
+</div>
+
+  </head>
+
+  <body class="layout--problemset">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="https://qeacourse.github.io/RoboNinjaWarrior/website_graphics/olinlogo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Machine Learning Spring 2026 @ Olin College
+          
+        </a>
+        <ul class="visible-links"></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Assignment 5">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Assignment 5
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+	      
+                <ul class="toc__menu">
+  <li><a href="#learning-objectives">Learning Objectives</a></li>
+  <li><a href="#linear-regression-and-ridge-regression-applied">Linear Regression and Ridge Regression Applied</a></li>
+  <li><a href="#confounding-variables">Confounding variables</a></li>
+  <li><a href="#the-classification-problem">The Classification Problem</a></li>
+  <li><a href="#formalizing-the-classification-problem">Formalizing the Classification Problem</a></li>
+  <li><a href="#probability-and-the-log-loss">Probability and the log loss</a></li>
+</ul>
+	      	
+            </nav>
+          </aside>
+        
+        <h1 id="learning-objectives">Learning Objectives</h1>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #C6EBD5;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-brain"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Learning Objectives</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<ul>
+  <li>Implement variations of linear regression on a dataset</li>
+  <li>Explore the effects of penalizing for weight size (ridge regression)</li>
+  <li>Contemplate confounding variables and Simpson’s paradox</li>
+  <li>Learn about log loss for binary classification</li>
+</ul>
+
+
+	</div>
+</div>
+
+<h1 id="linear-regression-and-ridge-regression-applied">Linear Regression and Ridge Regression Applied</h1>
+
+<p>So far, you have experimented two types of supervised learning: classification and regression. You worked through the derivation of linear regression. We are going to start this assignment by applying linear regression to our bike share dataset. You will find and plot residuals, practice splitting your data into a training and testing set, and apply a fancy twist on linear regression called ridge regression.</p>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 1</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Work through <a href="https://colab.research.google.com/drive/1fB6yrPuXm1_zTxYnKObtpgexmcXpDdG7?usp=sharing">this notebook</a>.</p>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-1&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-1" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>Solutions in the notebook.</p>
+
+     </div>
+</div>
+</div>
+</div>
+
+<h2 id="ridge-regression-math">Ridge Regression Math</h2>
+<p>In the Companion Notebook, you manipulated the value of lambda ($\lambda$) to change the penalty for having large weights. One way to mitigate the problem of having two little data or having features that are linear combinations of each other is to modify the linear regression problem to prefer solutions that have small weights.  We do this by penalizing the sum of the squares of the weights themselves.  This is called ridge regression (or Tikhonov regularization).  Below, we show the original version of ordinary least squares along with ridge regression.</p>
+
+<p>Ordinary least squares:</p>
+
+\[\begin{aligned}
+\mathbf{w^\star} &amp;= \argmin_\mathbf{w} \sum_{i=1}^n \left ( \mathbf{w}^\top \mathbf{x_i} - y_i \right)^2  \\  
+&amp;= \argmin_\mathbf{w} \left ( \mathbf{X}\mathbf{w} - \mathbf{y} \right)^\top \left ( \mathbf{X}\mathbf{w} - \mathbf{y} \right)
+\end{aligned}\]
+
+<p>Formula for the optimal weights in linear regression:</p>
+
+\[\begin{aligned}
+\mathbf{w^\star} = \left ( \mathbf{X}^\top \mathbf{X} \right)^{-1} \mathbf{X}^\top \mathbf{y}
+\end{aligned}\]
+
+<p>Ridge regression (note that $\lambda$ is a non-negative parameter that controls how much the algorithm cares about fitting the data and how much it cares about having small weights):</p>
+
+\[\begin{aligned}
+\mathbf{w^\star} &amp;= \argmin_\mathbf{w} \sum_{i=1}^n \left ( \mathbf{w}^\top \mathbf{x_i} - y_i \right)^2 + \lambda\sum_{i=1}^d w_i^2  \\  
+&amp;= \argmin_\mathbf{w} \left ( \mathbf{X}\mathbf{w} - \mathbf{y} \right)^\top \left ( \mathbf{X}\mathbf{w} -  \mathbf{y} \right) + \lambda \mathbf{w}^\top \mathbf{w}
+\end{aligned}\]
+
+<p>The penalty term may seem a little arbitrary, but it can be motivated on a conceptual level pretty easily.  The basic idea is that in the absence of sufficient training data to suggest otherwise, we should try to make the weights small.  Small weights have the property that changes to the input result in minor changes to our predictions, which is a good default behavior.</p>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 2</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Derive an expression to compute the optimal weights, $\mathbf{w^\star}$, to the ridge regression problem.</p>
+
+<p>Note: we may have gone over this already in class. You don’t need to write the whole thing out again if we covered it, but please review your notes to make sure you understand what’s going on.</p>
+
+<p style="font-size: x-large; font-weight: 700;">Part - first hint</p>
+
+<p>This is very, very similar to an exercise you did in <a href="../assignment02/assignment02">assignment 2</a>. You can click the 
+slow 
+solution button 
+below this for a hint.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-22&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-22" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>If you follow the same steps as you did in the <a href="../assignment02/assignment02?showAllSolutions=true#linearregmultiplevariables">exercise on linear regression with multiple variables from 
+assignment 3</a>, you’ll arrive at an expression that looks like this (note: $\mathbf{I}_{d \times d}$ is the $d$ by $d$ identity matrix).</p>
+
+\[\mathbf{w^\star} = \argmin_\mathbf{w} \mathbf{w}^\top \mathbf{X}^\top \mathbf{X} \mathbf{w} - 2\mathbf{w}^\top \mathbf{X}^\top \mathbf{y} + \mathbf{y}^\top \mathbf{y} + \lambda \mathbf{w}^\top  \mathbf{I}_{d \times d} \mathbf{w}\]
+
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part  - another hint</p>
+
+<p>If you want another hint, click on this solution</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-23&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-23" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>To get $\mathbf{w^\star}$, take the gradient, set it to 0 and solve for $\mathbf{w}$.</p>
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part  - Full Solution</p>
+
+<p>Okay, now check against the full solution.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-24&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-24" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{align*}
+\mathbf{w^\star} &amp;= \argmin_\mathbf{w} \left ( \mathbf{X}\mathbf{w} - \mathbf{y} \right)^\top \left ( \mathbf{X}\mathbf{w} -  \mathbf{y} \right) + \lambda \mathbf{w}^\top \mathbf{w} &amp; \\
+&amp;= \argmin_\mathbf{w} \mathbf{w}^\top \mathbf{X}^\top \mathbf{X} \mathbf{w} - 2\mathbf{w}^\top \mathbf{X}^\top \mathbf{y} + \mathbf{y}^\top \mathbf{y} + \lambda \mathbf{w}^\top  \mathbf{I}_{d \times d} \mathbf{w} &amp; \\
+&amp;= \argmin_{\mathbf{w}} \mathbf{w}^\top \left ( \mathbf{X}^\top \mathbf{X} + \lambda \mathbf{I_{d \times d}} \right )\mathbf{w} - 2\mathbf{w}^\top \mathbf{X}^\top \mathbf{y} + \mathbf{y}^\top \mathbf{y} &amp; \\
+0&amp;= 2 \left (  \mathbf{X}^\top \mathbf{X} + \lambda \mathbf{I_{d \times d}} \right ) \mathbf{w^\star} - 2 \mathbf{X}^\top \mathbf{y} &amp; \textit{(take the gradient and set to 0)}  \\
+\\
+\mathbf{w}^\star &amp;= \left ( \mathbf{X}^\top \mathbf{X} + \lambda \mathbf{I_{d \times d}} \right)^{-1} \mathbf{X}^\top \mathbf{y} &amp; \textit{(solve for \(\mathbf{w}^\star\))}
+\end{align*}\]
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<h1 id="confounding-variables">Confounding variables</h1>
+<p>You may have observed that some variables in the bikeshare data were correlated with each other. When dealing with data, we must be aware of the relationships of our variables and potential confounds. This matters both when we are creating our models and when we are interpreting our models. <a href="https://live.staticflickr.com/3055/2628869994_087a85722c_b.jpg">Hic sunt dracones</a>.</p>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 3</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>Please watch this video on <a href="https://www.youtube.com/watch?v=sxYrzzy3cq8">Simpson’s Paradox</a>. Explain what happen’s in Simpson’s paradox.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-25&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-25" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>See the video.</p>
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>Please come up with an example of Simpson’s paradox that was not mentioned in the video. You don’t have to know for sure that your example falls in to Simpson’s paradox– a reasonable suspicion of a confounding variable is fine. Please describe the paradox and the confounding variable that you suspect. This is a simple question, but it may be challenging to answer. If you are stuck, you might consider studies related to diet or health, the pandemic, or statistics related to elections. You may look up recent studies or articles to spark your imagination. We discourage you from Googling or just asking a large language model for “Simpson’s paradox examples”… the point is to think. It’s okay if you’re not right.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-26&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-26" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>Simpson’s paradox has to do with a <em>lurking</em> or <em>confounding</em> variable that isn’t accounted for.</p>
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<h1 id="the-classification-problem">The Classification Problem</h1>
+
+<p>So far in this class we’ve looked at supervised learning problems including a quick look at classification and a deeper look at regression. In regression, the responses $y_i$ are continuous-valued and the loss function is quadratic ($\ell(y, \hat{y}) = (y-\hat{y})^2$).  There are many times, however, where it is unnatural to frame a problem as a regression.  For instance, it may be the case that $y_i$ does not come from a continuous range but instead can only take on a few different values.  This sort of problem is known as a classification problem.  For instance, you might want to have a system that takes in an image of a person and predicts their identity.  The identity could be thought of as the output, $y_i$, and it would only make sense for $y_i$ to be one of several values (e.g., each value might represent a particular person the system was trained to recognize).  In this next section, you’ll learn about a special case of the classification problem known as binary classification (where $y_i$ is either 0 or 1, e.g., a Sam versus Paul recognizer).</p>
+
+<p>In this course, we will formalize the binary classification problem and see a very useful algorithm for solving it called <code class="language-plaintext highlighter-rouge">logistic regression</code>.  You will also see that the logistic regression algorithm is a very natural extension of linear regression.  Our plan for getting there is going to be pretty similar to what we did for linear regression.</p>
+
+<ul>
+  <li>Build some mathematical foundations</li>
+  <li>Introduce logistic regression from a top-down perspective</li>
+  <li>Learn about logistic regression from a bottom-up perspective</li>
+</ul>
+
+<p>In this assignment, we will focus on building the mathematical foundations, specifically learning about loss functions.</p>
+
+<h1 id="formalizing-the-classification-problem">Formalizing the Classification Problem</h1>
+<p>Let’s start by making the binary classification problem more formal.  Suppose, we are given a training set, $(\mathbf{x_1}, y_1), (\mathbf{x_2}, y_2), \ldots, (\mathbf{x_n}, y_n)$, where each $\mathbf{x_i}$ is an element of the input space (e.g., a vector) and each $y_i$ is a binary number (either 1 or 0).  In this setting we will attempt to use the training data to determine a function, $\hat{f}^\star$, that predicts the corresponding output, $y$, for any possible input, $\mathbf{x}$.  For example,  $\mathbf{x}$ could be an image and $y_i$ could be $1$ when the picture contains a puppy and $0$ otherwise.</p>
+
+<div id="loss01">
+
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 4</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>Given this partial setup of the binary classification problem, we still need to specify the loss function, $\ell$.  Recall that $\ell$ takes as input the actual output $y$, and the predicted output $\hat{y}$.  What function could you use for $\ell$ that would result in the learning algorithm choosing a good model?  If the choice of $\ell$ depends on the application, how so?</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-27&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-27" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>An easy choice is to output a $1$ if the values don’t match and a $0$ otherwise (essentially counting the number of mistakes the model makes).  Alternatively, you could have different penalties for a false positive (the model says $\hat{y} = 1$, but the actual value is $y = 0$) or false negatives (the model says $\hat{y} = 0$, but the actual value is $y = 1$).</p>
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>One natural choice for $\ell$, which you may have already come up with, is to define our loss function as $\ell(y, \hat{y}) = \mathbb{I}[y \neq \hat{y}]$. The funny looking $\mathbb{I}$ is the indicator function that takes on value 1 when the condition inside is true and 0 otherwise.  Given this choice the supervised learning problem becomes:</p>
+
+<p>\[
+\begin{aligned}
+\hat{f}^\star = \argmin_{\hat{f}} \sum_{i=1}^n \mathbf{I} \left [  \hat{f}(\mathbf{x_i}) \neq y_i\right ]
+\end{aligned}
+\]</p>
+
+<p>Convert the equation above to English to make sure you understand it.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-28&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-28" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>The equation says that $\hat{f}^\star$ is the function that minimizes the number of mistakes it makes on the training set.</p>
+
+</div>
+</div>
+
+
+</div>
+</div>
+</div>
+
+<p>While the loss function given in the exercise above on <a href="../assignment04/assignment04?showSolutions=true#loss01">0-1 loss</a> (minimizing mistakes on the training set) is a totally reasonable choice for the loss function, it turns out that it has a number of drawbacks.</p>
+
+<ul>
+  <li>It is all or nothing.  Either we are completely right or completely wrong.</li>
+  <li>It is not a particularly easy function to work with mathematically.  In fact, for many common classes of models, it will be difficult for the learning algorithm to find the best possible model. Note: One of the key challenges that must be met in machine learning, and modeling in general, is balancing computational considerations (e.g., how long does it take to find the best possible model) with the realism of the model (e.g., how directly does the task you pose to the learning algorithm match the problem you are solving).  Sometimes these things are in conflict and you must make tradeoffs..</li>
+</ul>
+
+<p>It turns out that we can create a more natural loss function by thinking about predictions in terms of probabilities.</p>
+
+<h1 id="probability-and-the-log-loss">Probability and the log loss</h1>
+
+<p>Imagine that instead of our model, $\hat{f}$, spitting out either 0 or 1, it outputs a confidence that the input $\mathbf{x}$ has an output $y= 1$.  In other words, rather than giving us its best guess (0 or 1), the classifier would indicate to us its degree of certainty regarding its prediction.  This notion of “certainty” can be formalized using the concept of a probability.  That is, a model can output a probability that the output for a particular input is 1.</p>
+
+<p>We haven’t formally defined probability in this class, but here are a few things to keep in mind about probabilities:</p>
+<ul>
+  <li>A probability, $p$, specifies the chance that some event occurs.  $p = 0$ means that the even will definitely not occur and $p=1$ means that it will definitely occur.</li>
+  <li>A probability, $p$, must be between 0 and 1 ($0 \leq p \leq 1$).</li>
+  <li>If the probability an event occurs is $p$, then the probability that the event doesn’t occur is $1 - p$.</li>
+</ul>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 5</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>For these questions, assume that for a given input the classifier outputs a probability that the output will be 1.</p>
+
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>If a classifier has no clear idea of whether the output for a particular input is 1 or 0, what probability should the classifier output?</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-29&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-29" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>The output would be about 0.5.</p>
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>If a classifier is relatively certain that the output for a particular input is 1, what probability should the classifier output?</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-30&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-30" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>The output would be close to 1 (e.g., 0.99).  The degree of closeness to 1 would depend on how certain the classifier was.</p>
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part C</p>
+
+<p>If a classifier is relatively certain that the output for a particular input is 0, what probability should the classifier output?</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-31&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-31" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>The output would be close to 0 (e.g., 0.01).  The degree of closeness to 0 would depend on how certain the classifier was.</p>
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<h2 id="log-loss">Log loss</h2>
+
+<p>If our model outputs a probability $p$ when supplied with an input $\mathbf{x}$ (i.e., $\hat{f}(\mathbf{x}) = p$), we might then ask ourselves what loss function we should choose in order to select the best possible model?  This loss function will be used to quantify how bad a prediction $p$ is given the actual output $y$ (recall that for binary classification the output is either $0$ or $1$).  To make this more intuitive, consider the task of quantifying the quality of a weatherperson’s predictions.  Let’s assume that on the $i$th day the weather is either sunny ($y_i = 1$) or rainy ($y_i = 0$).  Suppose that each night the weatherperson gives the probability of it being sunny the next day.  Here are two potential choices for quantifying the loss of each prediction compared to the outcome (the actual weather).</p>
+
+<ol>
+  <li><strong>0-1 loss:</strong> we will extract from the weatherperson’s prediction the most likely output (e.g., if $p = 0.75$, that would be sunny, if $p = 0.4$, that would be rainy).  If the most likely output matches the actual output we give a loss of 0, otherwise we give a loss of 1 (this is similar to the equation given in the exercise above on <a href="../assignment04/assignment04?showSolutions=true#loss01">0-1 loss</a>.</li>
+  <li><strong>squared loss:</strong> one downside of <code class="language-plaintext highlighter-rouge">0-1 loss</code> is that it doesn’t take into account the certainty expressed by the weatherperson.  The weatherperson gets the same loss if it is rainy and they predicted $p = 0.51$ or $p = 1$.  For squared loss we compute the difference between the outcome and $p$ and square it to arrive at the loss.  For example if the weatherperson predicts $p = 0.51$ and it is sunny the loss is $(1 - 0.51)^2$.  If it was rainy in this same example, the loss is $(0 - 0.51)^2$.</li>
+</ol>
+
+<p>As an example, here are hypothetical predictions from two forecasters, the actual weather, and the resulting loss with either <code class="language-plaintext highlighter-rouge">0-1 loss</code> or <code class="language-plaintext highlighter-rouge">squared loss</code>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>actual weather</th>
+      <th>forecast 1</th>
+      <th>0-1 loss</th>
+      <th>squared loss</th>
+      <th>forecast 2</th>
+      <th>0-1 loss</th>
+      <th>squared loss</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>sunny (y = 1)</td>
+      <td>p = 0.2</td>
+      <td>1</td>
+      <td>(1 - 0.2)^2 = 0.64</td>
+      <td>p = 0.9</td>
+      <td>0</td>
+      <td>(1 - 0.9)^2 = 0.01</td>
+    </tr>
+    <tr>
+      <td>rainy (y = 0)</td>
+      <td>p = 0.6</td>
+      <td>1</td>
+      <td>(0 - 0.6)^2 = 0.36</td>
+      <td>p = 0.999</td>
+      <td>1</td>
+      <td>(0 - 0.999)^2 = 0.998</td>
+    </tr>
+    <tr>
+      <td>sunny (y = 1)</td>
+      <td>p = 0.8</td>
+      <td>0</td>
+      <td>(1 - 0.8)^2 = 0.16</td>
+      <td>p = 0.99</td>
+      <td>0</td>
+      <td>(1 - 0.99)^2 = 0.0001</td>
+    </tr>
+    <tr>
+      <td><strong>sum</strong></td>
+      <td> </td>
+      <td><strong>2</strong></td>
+      <td><strong>1.16</strong></td>
+      <td> </td>
+      <td><strong>1</strong></td>
+      <td><strong>1.01</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 6</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>According to the table above, which forecaster is better with regards to <code class="language-plaintext highlighter-rouge">0-1 loss</code>?  Which forecaster is better with regards to <code class="language-plaintext highlighter-rouge">squared loss</code>?</p>
+
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-6&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-6" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>Forecaster 2 is better with respect to both loss functions (the losses are, on average, smaller).</p>
+
+     </div>
+</div>
+</div>
+</div>
+
+<p>One entry in the table above is particularly interesting.  In the third row the second forecaster assigned a probability of $0.999$ to it being sunny.  It turned out to rain (boo!!!).  The forecaster was almost certain it would be sunny and it wasn’t.  The 0-1 loss of course doesn’t capture this at all.  The squared loss seems to assign a fairly large loss.  One might argue, though, that this loss does not fully capture how bad the prediction was (for one thing the loss can never be above 1).  This last observation motivates a third loss function that we can use to evaluate probabilistic predictions: the log loss.</p>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #FFD1DC;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-external-link-alt"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">External Resources</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<p><a href="https://towardsdatascience.com/intuition-behind-log-loss-score-4e0c9979680a">Towards Data Science</a> has a nice writeup that explains the concept of log loss.  Or you’re welcome to search for your own resources about log loss. If you find a nice video, please post it to the Slack so others can enjoy too.</p>
+
+	</div>
+</div>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 7</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Revisit the example from before with the two weather forecasters.  Compute the log loss for each forecaster.  Who makes better predictions according to the log loss?</p>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-7&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-7" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>actual weather</th>
+      <th>forecast 1</th>
+      <th>log loss</th>
+      <th>forecast 2</th>
+      <th>log loss</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>sunny (y = 1)</td>
+      <td>p = 0.2</td>
+      <td>-ln 0.2</td>
+      <td>p = 0.9</td>
+      <td>-ln 0.9</td>
+    </tr>
+    <tr>
+      <td>rainy (y = 0)</td>
+      <td>p = 0.6</td>
+      <td>-ln 0.4</td>
+      <td>p = 0.999</td>
+      <td>-ln 0.001</td>
+    </tr>
+    <tr>
+      <td>sunny (y = 1)</td>
+      <td>p = 0.8</td>
+      <td>-ln 0.8</td>
+      <td>p = 0.99</td>
+      <td>-ln 0.99</td>
+    </tr>
+    <tr>
+      <td><strong>sum</strong></td>
+      <td> </td>
+      <td><strong>2.75</strong></td>
+      <td> </td>
+      <td><strong>7.02</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+<p>Note that log loss is also sometimes referred to as binary cross entropy loss.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2026 Machine Learning Spring 2026 @ Olin College.</div>
+
+      </footer>
+    </div>
+
+    <script src="/assets/js/copyCode.js"></script>
+
+
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

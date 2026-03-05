@@ -1,0 +1,1199 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.17.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<script>
+class AnchorNoProxy extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._$a = null;
+  }
+  connectedCallback() {
+    const href = this.getAttribute("href") || "#";
+    if (this.dataset.hasOwnProperty('canvas')) {
+        const canvasURL = this.dataset.canvas;
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}" data-canvas="${canvasURL}"><slot></slot></a>`;
+    } else {
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}"><slot></slot></a>`;
+    }
+    this._$a = this.shadowRoot.querySelector("a");
+    this._$a.addEventListener("click", e => {
+      var url = this.getAttribute('href');
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+        window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+        window.open(url, '_blank');
+      }
+    });
+  }
+  static get observedAttributes() { return ["href"]; }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      if (this._$a === null) return;
+      this._$a.setAttribute("href", newValue);
+    }
+  }
+}
+
+customElements.define("a-no-proxy", AnchorNoProxy);
+
+class NoProxy extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+      	window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+      	window.open(this.href, '_blank');
+      }
+    });
+  }
+}
+
+customElements.define("no-proxy", NoProxy, { extends: "a" });
+
+class ConfirmLink extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      const result = confirm(`Are you sure you want to go to '${this.href}'?`);
+      if (!result) e.preventDefault();
+    });
+  }
+}
+
+customElements.define("confirm-link", ConfirmLink, { extends: "a" });
+
+</script>
+
+<!-- begin _includes/seo.html --><title>Assignment 1 - Machine Learning Spring 2026 @ Olin College</title>
+<meta name="description" content="Website">
+
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Machine Learning Spring 2026 @ Olin College">
+<meta property="og:title" content="Assignment 1">
+<meta property="og:url" content="/assignments/assignment01/assignment01.html">
+
+
+  <meta property="og:description" content="Website">
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="canonical" href="/assignments/assignment01/assignment01.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Machine Learning Spring 2026 @ Olin College Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  // Render Mermaid first, from untouched source.
+  mermaid.initialize({ startOnLoad: false });
+  await mermaid.run(); // renders all .mermaid blocks
+
+  // render KaTeX
+  renderMathInElement(document.body, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+    throwOnError: false,
+  });
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showSolutions = urlParams.get('showSolutions');
+    const showAllSolutions = urlParams.get('showAllSolutions');
+    const divs = document.querySelectorAll('button.togglebutton');
+
+    if (showSolutions == 'true') {
+        // Loop through the selected divs and manipulate them
+        divs.forEach(div => {
+            div.removeAttribute('hidden');
+        });
+    }
+
+    const solutionDivs = document.querySelectorAll('[id^=solution]');
+    const subpartSolutionDivs = document.querySelectorAll('[id^=subpartsolution]');
+
+    if (showAllSolutions == 'true') {
+        solutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+
+        subpartSolutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+    }
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<style>
+:root {
+    --box-bg-color: #fff; /* Default background color */
+}
+
+.homework-box {
+    background-color: var(--box-bg-color);
+    border: 2px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+}
+
+.homework-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.homework-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* Handle missing or empty src attribute */
+.homework-icon[src=""],
+.homework-icon:not([src]) {
+    content: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Games_for_Learning_%2827470%29_-_The_Noun_Project.svg');
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.homework-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.homework-content {
+    font-size: 16px;
+    color: #333;
+}
+</style>
+
+<style>
+.solution {
+    display: none; /* Hide solutions by default */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-left: 4px solid #007bff;
+    margin-top: 10px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.toggle-button.hide-solution {
+    background-color: #dc3545; /* Red background for hide button */
+}
+
+img.mermaid {
+     max-width:500px;
+     text-align: center;
+}
+
+</style>
+
+<div style="display:none;">
+$
+\newcommand{\mlvec}[1]{\mathbf{#1}}
+\newcommand{\mlmat}[1]{\mathbf{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\DeclareMathOperator*{\argmin}{arg\,min\,}
+$
+</div>
+
+  </head>
+
+  <body class="layout--problemset">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="https://qeacourse.github.io/RoboNinjaWarrior/website_graphics/olinlogo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Machine Learning Spring 2026 @ Olin College
+          
+        </a>
+        <ul class="visible-links"></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Assignment 1">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Assignment 1
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+	      
+                <ul class="toc__menu">
+  <li><a href="#learning-objectives">Learning Objectives</a></li>
+  <li><a href="#please-read-the-syllabus">Please read the syllabus</a></li>
+  <li><a href="#fill-out-some-surveys">Fill Out Some Surveys</a></li>
+  <li><a href="#join-the-discord-if-you-want">Join the Discord if you want</a></li>
+  <li><a href="#the-machine-learning-lifecycle">The Machine Learning Lifecycle</a></li>
+  <li><a href="#five-big-ideas-in-machine-learning">Five Big Ideas in Machine Learning</a></li>
+  <li><a href="#mathematical-background">Mathematical Background</a></li>
+  <li><a href="#key-metrics-for-assessing-classifiers">Key Metrics for Assessing Classifiers</a></li>
+  <li><a href="#footnotes">Footnotes</a></li>
+</ul>
+	      	
+            </nav>
+          </aside>
+        
+        <h1 id="learning-objectives">Learning Objectives</h1>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #C6EBD5;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-brain"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Learning Objectives</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<ul>
+  <li>Gain some familiarity with some of the key ideas in machine learning and the machine learning lifecycle.</li>
+  <li>Explore metrics to assess machine learning classifiers.</li>
+  <li>Review of mathematical concepts we will be using in the beginning part of this course.</li>
+  <li>Familiarize yourself with computational tools for machine learning, including python.</li>
+</ul>
+
+<p>This document contains a lot of external links. They are there to help
+you learn more if you are interested. You are not required to read/watch
+all the linked material.</p>
+
+	</div>
+</div>
+
+<p>There is a substantial Jupyter notebook that is part of your assignment linked at the end of this document. Just warning you here so you can avoid thinking that you’re almost done, only to realize that you’re only halfway finished.</p>
+
+<h1 id="please-read-the-syllabus">Please read the syllabus</h1>
+
+<p>The <a href="https://olin.instructure.com/courses/1000/assignments/syllabus">syllabus</a> is available on Canvas. Please read it, it contains a lot
+of helpful information.  If you have any questions about the syllabus, please post them on Discord so we can
+clarify (and practice using Discord as a class). Or if it is a personal
+question, you can always email me or send me a direct message on Discord.</p>
+
+<h1 id="fill-out-some-surveys">Fill Out Some Surveys</h1>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 1</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Before we get into the semester, we’d like to understand how you all are thinking about
+machine learning, AI, and engineering in general.  Please use this link to Canvas to find <a href="https://olin.instructure.com/courses/1000/assignments/17769">the surveys</a>.  It should take about 20 minutes to complete the surveys.
+Note: that these surveys wil be used as part of an <a href="../../education_research/education_research">education research project</a> we are doing this semester. You have the option to participate in this research, but you are not required to do so.</p>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-1&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-1" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+<h1 id="join-the-discord-if-you-want">Join the Discord if you want</h1>
+
+<p>We’ll have an optional course-wide Discord server for asking questions. Of course, you can always go to office hours and send emails, but Discord can make it easier to create a thread about a specific question. The link to join Discord is found on the syllabus.</p>
+
+<h1 id="the-machine-learning-lifecycle">The Machine Learning Lifecycle</h1>
+
+<p>In class, we explored aspects of the machine learning lifecycle. Please continue to read through <a href="https://www.datacamp.com/blog/machine-learning-lifecycle-explained">this short article to continue to build your sense of the big picture</a> (about 10 minutes).</p>
+
+<h1 id="five-big-ideas-in-machine-learning">Five Big Ideas in Machine Learning</h1>
+
+<p><strong>Note: We suggest you timebox this section to a maximum of 60 minutes
+to start, including the exercise. Beware of the many interesting rabbit
+holes that could consume your day. You can always revisit this later.</strong></p>
+
+<p>Before diving into the specifics of our first machine learning
+algorithm, let’s examine some important ideas in machine learning.</p>
+
+<h2 id="idea-1-correlations-without-causation-can-cause-all-sorts-of-problems">Idea 1: Correlations Without Causation Can Cause All Sorts of Problems</h2>
+
+<p>ML algorithms learn to exploit correlations in data in order to make
+predictions. For instance, if one was using an ML algorithm to recognize
+whether someone was smiling in an image, the algorithm might learn that
+bright pixels around the mouth region are correlated with smiles (e.g.,
+these bright pixels could indicate that a person’s teeth are showing). This correlation would
+likely be useful for determining whether a new image of a face was of a smiling person (or not).
+Now suppose you take this model and apply it to a new
+dataset. You may find that faces that are angry are mistakenly marked as
+smiling! Why? In the case of angry facial expressions the teeth may also
+be showing. Of course, you would expect the learning algorithm to be
+smart enough to realize that just using the presence of teeth is not
+enough to conclusively determine whether someone is smiling. Whether this actually happens is a function of the training data given to
+the ML algorithm. If, for instance, the training set was scraped from
+profile pictures from a dating website, the training set may not contain
+pictures of angry faces. Unfortunately, while exploiting correlations is
+one of the most powerful aspects of ML systems, it is also one of the
+most potentially problematic.  The idea that the testing dataset may differ significantly from the training dataset
+is known in the ML literature as <em>distribution shift</em>.</p>
+
+<p><em>Example 1: Reinforcing Hiring Biases</em> An important (and unfortunately not uncommon) example of a machine learning system
+exploiting a spurious correlation was when <a href="https://www.reuters.com/article/us-amazon-com-jobs-automation-insight/amazon-scraps-secret-ai-recruiting-tool-that-showed-bias-against-women-idUSKCN1MK08G">Amazon
+scrapped a secret AI recruiting tool that showed bias against
+women</a>.
+More specifically, the tool performed automatic keyword analysis of job
+applications to predict whether the applicant was worth
+forwarding on to a human for further evaluation. Early in the
+development of this system researchers discovered that the model the
+system had learned placed a negative weight on words such as “women’s”
+as well as the names of some women’s colleges. While there is of course
+no causal link between these words appearing in a job application and
+the suitability of the candidate for the job, there was a <em>correlation</em>
+in the training set between the presence of words such as “women’s” and
+the candidates not being invited for interviews.  A correlation such as this is known as a <em>spurious correlation</em> (meaning there is no causal relationship between the two correlated phenomena).</p>
+
+<p>Why might a spurious correlation exist in the training set? There are many
+different possible explanations for this correlation, ranging from overt
+or unconscious bias in the applicant evaluators whose judgments helped
+form the training data to systemic discrimination that denies women
+equal access to educational opportunities in STEM. The important thing
+to take away from this is not <em>why</em> there was a correlation, but that
+the existence of the correlation in the training data caused the model
+to utilize the correlation in order to evaluate new data. Amazon
+realized that this was very bad and decided to take steps to address the
+problem (they say they never used the system to make actual
+job-screening decisions). Despite efforts to prevent the algorithm for
+exploiting such correlations, the group determined that they couldn’t
+fully guarantee that the algorithm had not found another way to achieve
+the same discriminatory outcome and terminated the project.</p>
+
+<p>A more modern example of the Amazon AI recruiting tool the task of detecting and <a href="https://www.datacamp.com/blog/understanding-and-mitigating-bias-in-large-language-models-llms">mitigating bias in large language models (LLMs)</a>.  Researchers are hard at work creating additional methods to mitigate and detect biases in these models (you might consider skimming the linked article for a high-level picture of what this looks like in practice.)</p>
+
+<p><em>Example 2: Adversarial Machine Learning</em></p>
+
+<p>A second example of an ML algorithm exploiting correlations in training
+data in unexpected ways can be found in computer vision methods for
+object detection. Identifying salient visual objects such as road signs
+and pedestrians is an important building block for applications such as
+autonomous cars. A popular algorithm for this task,
+<a href="https://pjreddie.com/darknet/yolo/">YOLO</a> (You Only Look Once)<sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup>, can
+identify and localize objects in images with surprising accuracy. For
+instance, in the image below YOLO identified the stop sign in the image
+successfully.</p>
+
+<div style="text-align: center;">
+<img src="figures/stopsignyolo.jpeg" width="50%" />
+</div>
+
+<p>While this all seems great, there is a catch. It is very difficult to
+understand <em>how</em> YOLO is making these predictions. That is, what is it
+about this image that causes the YOLO algorithm to be able to tell that
+it is a stop sign? Perhaps it is the white text on the red background.
+Perhaps it is the word “STOP.” In fact, the network that makes this
+prediction is so complex, that it is impossible for us to say
+definitively exactly how it makes its decision. What we do know is that
+the model exploits correlations in the training data between input
+features (pixels) and outputs (object locations) in potentially
+unpredictable ways.</p>
+
+<figure id="figure1">
+    <div style="text-align: center;">
+        <img src="figures/yolofooled.png" alt="A stop sign is shown with various stickers on it.  On top of the stickers, erroneous identifications of bottles are shown (no bottles are present in the image)." style="max-width: 40%" />
+    </div>
+    <figcaption style="font-size: large">
+        Figure 1: <p>A stop sign with a specially crafted sticker that causes a neural network to fail to identify it as a stop sign.</p>
+
+    </figcaption>
+</figure>
+
+<p>The complexity of the model makes it vulnerable to bad actors (or
+adversaries). Researchers at University of Michigan used a form of ML
+known as <em>adversarial machine learning</em> to <a href="https://iotsecurity.engin.umich.edu/physical-adversarial-examples-for-object-detectors/">create a specially crafted
+sticker that could be attached to a stop sign that would make it
+invisible to the YOLO
+model</a>
+(that is YOLO would not identify it as a stop sign). Clearly, this has
+major implications for the safety of using a model such as this in an
+application like a self-driving car. An example of the attack is shown
+in <a href="#figure1">Figure 1</a>.</p>
+
+<h2 id="idea-2-theres-no-such-thing-as-a-free-lunch">Idea 2: There’s No Such Thing as a Free Lunch</h2>
+
+<blockquote>
+  <p><a href="https://en.wikipedia.org/wiki/All_models_are_wrong">“All models are wrong, but some useful.”</a></p>
+
+  <p>— George Box</p>
+</blockquote>
+
+<p>At the beginning of this document we have a reminder of the basic
+supervised machine learning setup. A one sentence statement of the setup
+is that we try to generalize from a set of training data to construct a
+function $\hat{f}^\star$ that best predicts the corresponding output
+data for unseen input data (e.g., predicting the facial expression of a
+face that was not in the training set based on a training set of sample
+faces). In the previous big idea, we discussed how machine learning
+could go wrong when there are correlations in the data that seem useful
+to the ML algorithm but are ultimately counterproductive to how we’d
+like the system to make decisions. It turns out that even before you
+choose the training data for your algorithm, you must provide an
+<a href="https://en.wikipedia.org/wiki/Inductive_bias">inductive bias</a> to
+constrain the space of possible models you might fit. Examples of common
+inductive biases include the following (the previously linked article
+has some more).</p>
+
+<p>The prediction function $\hat{f}^\star$ should change smoothly as you
+vary the input $\mathbf{x}$.</p>
+
+<p>The prediction function has a particular form (e.g., linear).</p>
+
+<p>The prediction function is sparse (it ignores the majority of the
+inputs).</p>
+
+<p>In fact, there are a whole class of theorems called <a href="https://en.wikipedia.org/wiki/No_free_lunch_theorem">No-Free-Lunch (NFL)
+theorems</a> that state that without inductive biases (such as the ones stated above),
+learning from data is essentially impossible. This connects us back to
+the quote from George Box. While the inductive bias we encode into our
+model will never fully represent reality, having this bias is necessary
+to allow the model to do the useful work of making predictions. What’s
+important for us as machine learning scientists and practitioners is to
+be explicit about the biases we are introducing when settling on a
+particular model so that we can best evaluate our results and predict
+the limitations of our systems.  As we learn more about various machine learning architectures (e.g., transformers and convolutional neural networks), it helps to remind ourselves of the assumptions
+encoded in these systems.</p>
+
+<h2 id="idea-3-its-all-about-how-you-frame-the-problem">Idea 3: It’s All About How You Frame the Problem</h2>
+
+<p>Using Machine Learning algorithms can be a bit disorienting for someone
+used to the typical engineering workflow. A cartoon picture of the
+engineering workflow is that you are given a problem (perhaps it is
+initially difficult to solve or ambiguous), you might reframe the
+problem to make it easier to solve, and then you work to devise a
+solution to the reframed problem. In machine learning, the last step is
+replaced by providing examples of how you’d like your system to work
+(i.e., input / output pairs), and then the creation of the actual system
+is automated by the ML algorithm! Your job as an ML practitioner is to
+reframe the original problem (both by specifying the form of the model
+and giving appropriate training data) so that the ML algorithm can
+compute a solution. If you’ve done the reframing properly, the solution
+to the reframed problem will also be a good solution to the original
+problem.</p>
+
+<p>As an example of when a solution to the reframed problem would not be
+desirable, consider the use of a machine learning algorithm to teach a
+virtual character to walk in a simulated environment. You might reframe
+this problem for the ML algorithm as tasking it with computing a
+controller for the virtual character that moves the character’s center
+of mass forward as fast as possible. The ML algorithm can now search
+over a vast space of possible control strategies to learn the one that
+most quickly propels the center of mass. However, it doesn’t necessarily
+follow that this controller will result in the character walking using a
+normal bipedal gait.</p>
+
+<div style="text-align: center;">
+<img src="figures/fallingbot.png" width="80%" />
+</div>
+
+<p>The notion that the solution an algorithm finds might be unpredictable
+to the designer is known as “emergence.” Some cool examples of this
+played out in actual experiments in evolving virtual creatures, which
+are summarized in the paper <a href="https://arxiv.org/pdf/1803.03453.pdf">The Surprising Creativity of Digital
+Evolution</a>. For instance, a
+virtual character learned that falling down, see picture above, and
+getting up was more efficient for locomotion than constantly hopping
+(which is what the designer had intended the system to learn).</p>
+
+<p>For more examples of this sort of thing, consider checking out <a href="https://www.youtube.com/watch?v=bBt0imn77Zg">Karl Sims: Evolved Virtual
+Creatures</a> or the short article <a href="https://aiweirdness.com/post/172894792687/when-algorithms-surprise-us">When AI Surprises
+Us</a>. This also connects back to the age-old debate over whether <a href="https://www.youtube.com/watch?v=DwN6efmhp7E">falling with
+style can be considered
+flying</a>.</p>
+
+<p>The idea that machine learning algorithms can find unproductive solutions is not confined to reinforcement learning 
+problems.  A seminal paper called <a href="https://arxiv.org/abs/2004.07780">“Shortcut Learning in Deep Neural Networks”</a>
+discusses how the same phenomenon can occurs in other types of machine learning problems.</p>
+
+<h2 id="idea-4-machine-learning-zoomed-out">Idea 4: Machine Learning Zoomed Out</h2>
+
+<p>Historically, most ML courses have been laser-focused on learning about
+learning algorithms (e.g., neural networks, support vector machines,
+decision trees, etc.). In some courses there would be a little bit of
+emphasis on machine learning applications, which have always been
+strongly tied to the research in ML algorithms and theory. The focus on
+ML algorithms also reflected the positioning of these courses within
+Computer Science curricula, which approached the field more from a
+liberal arts perspective rather than an engineering one.</p>
+
+<p>A number of recent trends have made the almost sole focus on learning
+algorithms insufficient for those who want to either use ML in their
+careers or go into ML as a field.</p>
+
+<p>The explosion of data has made the skills necessary for collecting,
+wrangling, exploring, and cleaning data very relevant.</p>
+
+<p>Improvements in the accuracy of ML algorithms coupled with the ability
+to deploy ML systems to a wide variety of devices (e.g., mobile phones)
+means that it is increasingly important to consider how ML systems will
+behave in real-world, highly complex settings.</p>
+
+<p>The first point ties into a set of skills sometimes grouped under “Data
+Science.” While we will have a comparatively lesser focus on this
+skillset than in our dedicated Data Science course, we will be learning
+some of these skills. The second point corresponds to ML systems as
+embedded in larger and more complex contexts. As you’ve seen from some
+of the examples earlier in this document, unexpected things can happen
+when ML algorithms meet messy and/or biased real world data (take for
+example the automated job applicant evaluator). In light of this, again,
+we think that the traditional focus on ML algorithms is not adequate for
+a modern class on ML. Here are two figures to further illustrate this
+point.</p>
+
+<p><img src="/assignments/assignment01/figures/MlSystem.png" alt="A schematic of a machine learning system including all of the relevant components." /></p>
+
+<p>In the figure above, the box labeled <em>ML Code</em> is the actual learning
+algorithm. But in modern systems, this is but a small fraction of all of
+the tools needed to deploy a real world ML system. This is not to say
+that we will be spending a lot of time learning about each of these
+other boxes (we will learn about some of them), but it helps to have a
+sense of the software ecosystem in which your ML model would be
+deployed.</p>
+
+<p><img src="/assignments/assignment01/figures/sociotechnical.png" alt="A diagram of the sociotechnical view of machine learning.  The system highlights things like policy, culture, and infrastructure." /></p>
+
+<p>In addition to understanding how ML code is situated within larger
+software ecosystems, it is even more important to realize the
+<a href="https://en.wikipedia.org/wiki/Sociotechnical_system">socio-technical
+context</a> in which
+an ML system is deployed. The figure above shows a socio-technical
+analysis of a technology. The figure highlights the need to consider
+contextual factors such as user impacts, culture, and regulations when
+analyzing technologies.</p>
+
+<p>Using the tools of socio-technical systems analysis is becoming
+increasingly popular for analyzing machine learning systems. We’ll be
+digging into some of these resources later in the course, but here are
+two papers in this spirit.</p>
+
+<p><a href="https://link.springer.com/article/10.1007/s11023-017-9417-6">Reframing AI
+Discourse</a></p>
+
+<p><a href="https://dl.acm.org/citation.cfm?id=3287598">Fairness and Abstraction in Sociotechnical
+Systems</a></p>
+
+<h2 id="idea-5-its-not-all-doom-and-gloom">Idea 5: It’s Not All Doom and Gloom</h2>
+
+<p>While we’ll be talking a lot about how ML can go wrong, unleashing
+unexpected consequences, we’ll also be talking about the positive things
+that ML can do. Here are just a couple of resources that discuss such
+systems (not to say that these systems don’t have the potential for
+things to go wrong!). We’ll leave this list deliberately short to give
+you a chance to find your own example in the exercise below.  Some of these examples are a little old, but they are still good starting points.</p>
+
+<ul>
+  <li><a href="https://www.springboard.com/blog/data-science/ai-for-good/">AI for social good: 7 inspiring
+examples</a></li>
+  <li>While not without controversy, some companies (and researchers) are working on <a href="https://www.deque.com/blog/enhancing-accessibility-with-ai-and-ml/">Enhancing Accessibility with AI and ML</a>.</li>
+  <li><a href="https://fpf.org/wp-content/uploads/2016/03/Final_19Times-Data_Mar2016-1.pdf">19 Times Data Analysis Empowered Students and
+Schools</a></li>
+  <li>Austin Veseliza put together <a href="https://www.notion.so/ML-for-Good-c0cc352c88b04e719c187c8e4a6f5887">a list of links to AI for social good
+projects</a> that you might use for inspiration.<sup id="fnref:2" role="doc-noteref"><a href="#fn:2" class="footnote" rel="footnote">2</a></sup></li>
+</ul>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 2</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Now, we want to hear from you!</p>
+
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>Choose one of the big ideas above and write a short response to it. Your
+response could incorporate something surprising you read, a
+thought-provoking question, your personal experience, an additional
+resource that builds upon or shifts the discussion. We hope that this
+reflection will help scaffold class discussions and get you thinking
+about your interests in the big space that is ML. Also, you have license
+from us to customize the structure of your response as you see fit. As a
+rough guide, you should aim for a response of a 1-2 paragraphs.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-1&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-1" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>There’s no one right answer here!</p>
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>Idea 5 talks about the idea of ML for positive impact. What is one
+example of an ML application (real or imagined) that you think would
+have the largest (or most unambiguously) positive impact on the world?
+Why? Alternatively, what is an example of an ML application (real or
+imagined) that no matter how carefully the designers approach it, should
+just not exist due to the harm it would cause the world? Why?</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-2&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-2" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>There’s no one right answer here!</p>
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<h1 id="mathematical-background">Mathematical Background</h1>
+
+<p>We’ll be using some math in this class that you’ve probably seen before (but maybe that has faded into a distant memory). We are giving you a little heads up here to give you ample time to refresh before we actually start using this math. Even if most of these concepts feel pretty new or unfamiliar, you still belong in this class (feel free to reach out to us if you have questions).</p>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #FDFD96;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fa fa-exclamation-triangle"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Notice</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<p>For the purposes of this class, we will try to be consistent with the notation
+we use. Of course, when we link to other resources, they may use other
+notation. If notation is different in a way that causes confusion, we
+will try to point out pitfalls you should watch out for. Please use this
+link to access our guide to <a href="notation_conventions">our notation
+conventions</a></p>
+
+	</div>
+</div>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #FFD1DC;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-external-link-alt"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">External Resources</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<p>In order to engage with this and future assignments, you’ll want to make
+sure you are familiar with the concepts (links to resources
+embedded below):</p>
+
+<ul>
+  <li>
+    <p>Vector-vector multiplication: Section 2.1 of <a href="https://see.stanford.edu/materials/aimlcs229/cs229-linalg.pdf">Zico Kolter’s Linear Algebra Review and
+Reference</a></p>
+  </li>
+  <li>Matrix-vector multiplication
+    <ul>
+      <li>Section 2.2 of <a href="https://see.stanford.edu/materials/aimlcs229/cs229-linalg.pdf">Zico Kolter’s Linear Algebra Review and
+Reference</a></li>
+      <li>The first bits of the Khan academy video on <a href="https://www.khanacademy.org/math/linear-algebra/matrix-transformations/linear-transformations/v/matrix-vector-products-as-linear-transformations">Linear
+Transformations</a></li>
+    </ul>
+  </li>
+  <li>Partial derivatives and gradients
+    <ul>
+      <li>Khan Academy videos on partial derivatives:
+<a href="https://www.khanacademy.org/math/multivariable-calculus/multivariable-derivatives/partial-derivatives/v/partial-derivatives-introduction">intro</a>,
+<a href="https://www.khanacademy.org/math/multivariable-calculus/multivariable-derivatives/partial-derivatives/v/partial-derivatives-and-graphs">graphical
+understanding</a>,
+and <a href="https://www.khanacademy.org/math/multivariable-calculus/multivariable-derivatives/partial-derivatives/v/formal-definition-of-partial-derivatives">formal
+definition</a></li>
+      <li><a href="https://www.khanacademy.org/math/multivariable-calculus/multivariable-derivatives/gradient-and-directional-derivatives/v/gradient">Khan Academy video on
+Gradient</a></li>
+    </ul>
+  </li>
+</ul>
+
+
+	</div>
+</div>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 3</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Work through these math exercises to figure out which of the topics above you need to spend some more time on.</p>
+
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>Suppose $f(x, y) = 2x \sin{y} + y^2 x^3$. Calculate
+$\frac{\partial{f}}{\partial{x}}$, $\frac{\partial{f}}{\partial{y}}$,
+and $\nabla f$.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-3&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-3" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{align}
+\frac{\partial{f}}{\partial{x}} &amp;= 2 \sin y + 3 y^2 x^2 \\ 
+\frac{\partial{f}}{\partial{y}} &amp;= 2x \cos y + 2 y x^3 \\ 
+\nabla f &amp;= \begin{bmatrix} 2 \sin y + 3 y^2 x^2 \\ 2x \cos y + 2 y x^3 \end{bmatrix} 
+\end{align}\]
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>Suppose \(\mathbf{x} = \begin{bmatrix} 3 \\ -1 \\ 4 \end{bmatrix}\) and
+\(\mathbf{y} = \begin{bmatrix} 2 \\  7 \\ 4 \end{bmatrix}\). Calculate
+$\mathbf{x} \cdot \mathbf{y}$, $\mathbf{x}^\top \mathbf{y}$, and
+$\mathbf{x} \mathbf{y}^\top$.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-4&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-4" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{align*}
+\mathbf{x} \cdot \mathbf{y} &amp;= 3 \times 2 + -1 \times 7 + 4 \times 4 = 15 \\ 
+\mathbf{x}^\top \mathbf{y} &amp;= \mathbf{x} \cdot \mathbf{y} = 15 \\ 
+\mathbf{x} \mathbf{y}^\top &amp;= \begin{bmatrix} 3 \times 2 &amp; 3 \times 7 &amp; 3 \times 4 \\ -1 \times 2 &amp; -1 \times 7 &amp; -1 \times 4 \\ 4 \times 2 &amp; 4 \times 7 &amp; 4 \times 4 \end{bmatrix} \\ 
+&amp;= \begin{bmatrix} 6 &amp; 21 &amp; 12 \\ -2 &amp; -7 &amp; -4 \\ 8 &amp; 28 &amp; 16 \end{bmatrix}\end{align*}\]
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part C</p>
+
+<p>Let \(\mathbf{A} = \begin{bmatrix} \mathbf{a_1} &amp; \mathbf{a_2} &amp; \ldots &amp; \mathbf{a_n} \end{bmatrix} = \begin{bmatrix} \mathbf{row}_1 \\ \mathbf{row}_2 \\ \vdots \\ \mathbf{row}_m \end{bmatrix}\)</p>
+
+<p>where each $\mathbf{row_{i}}$ is a row vector (vectors in this class will default to being column vectors, so here we’re giving it a special name to indicate it’s a row vector).</p>
+
+<p>So, the matrix $\mathbf{A}$ can either be thought of as consisting
+of the columns $\mathbf{a_1}, \ldots, \mathbf{a_n}$ or the rows
+$\mathbf{row_1}, \ldots, \mathbf{row_m}$.</p>
+
+<p>Let $\mathbf{v}$ be an arbitrary $n$-dimensional vector.</p>
+
+<p>Compute $\mathbf{A}\mathbf{v}$ in terms of
+$\mathbf{a_1}, \ldots, \mathbf{a_n}$.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-5&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-5" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\mathbf{A} \mathbf{v} &amp;= v_1 \mathbf{a}_1 + v_2 \mathbf{a}_2 + \ldots + v_n \mathbf{a}_n
+\end{aligned}\]
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part D</p>
+
+<p>Compute $\mathbf{A} \mathbf{v}$ in terms of the rows of
+$\mathbf{row_1}, \ldots, \mathbf{row_m}$.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-6&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-6" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\mathbf{A} \mathbf{v} &amp;= \begin{bmatrix} \mathbf{v} \cdot \mathbf{row}_1 \\   \mathbf{v} \cdot \mathbf{row}_2 \\ \vdots \\ \mathbf{v} \cdot \mathbf{row}_m \end{bmatrix}
+\end{aligned}\]
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<h1 id="key-metrics-for-assessing-classifiers">Key Metrics for Assessing Classifiers</h1>
+
+<p>The last part of this assignment is to meet some key metrics for assessing classification models while also getting our python brains warmed up for the coding in this class.</p>
+
+<p>Please work through the exercises in this <a href="https://colab.research.google.
+com/drive/1lnoGbjLkIN30UoxFgt0gOVO3IykMcSAr?usp=sharing">Jupyter notebook</a>.
+It’s hosted on Google Colab, so you can either make your own copy and run it on Colab or download and run it locally (you may have to make small tweaks).</p>
+
+<p>While you are at it, you may want to sign up for a free year of Colab Pro (see this <a href="https://olin.instructure.com/courses/1000/pages/get-colab-pro?module_item_id=20148">link on Canvas for instructions</a>).</p>
+
+<h1 id="footnotes">Footnotes</h1>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:1" role="doc-endnote">
+      <p>A <a href="https://www.youtube.com/watch?time_continue=77&amp;v=MPU2HistivI">Cool video of YOLO version
+3</a>,
+a <a href="https://www.youtube.com/watch?v=Cgxsv1riJhI">TED talk from the creator of YOLO
+researcher</a>, <a href="https://docs.ultralytics.com/models">newer variants of YOLO have been created by other 
+researchers</a>, and a nice <a href="https://www.youtube.com/watch?v=G2GEUhe2ro8">hands-on video with YOLO26</a> (latest version) <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+    <li id="fn:2" role="doc-endnote">
+      <p>This list was part of the original version of this assignment,
+made in 2019. We are glad we can remember one of the many good
+things Austin created at Olin. <a href="#fnref:2" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2026 Machine Learning Spring 2026 @ Olin College.</div>
+
+      </footer>
+    </div>
+
+    <script src="/assets/js/copyCode.js"></script>
+
+
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

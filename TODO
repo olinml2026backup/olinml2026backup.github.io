@@ -1,0 +1,8 @@
+Automatically add the "with show solutions button" to index.markdown (may need to gate with an attribute on each markdown file since some pages don't have solutions)`
+Handle missing rows in the index.markdown file (currently messes up the table format)
+
+Incorporate the vignette into assignment 2 (or day 3) https://docs.google.com/document/d/1sVVcVxzAveeW2MzNJyaOH11hWCKffZlLkNNBQSrCFcI/edit?tab=t.0
+
+For the survey add in the Do you want to explain something? (need some kind of free response part of the section).
+
+Maybe something that probes how students are thinking about the case study (are they annoyed? excited?)

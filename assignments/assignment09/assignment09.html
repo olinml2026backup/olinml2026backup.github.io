@@ -1,0 +1,794 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.17.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<script>
+class AnchorNoProxy extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._$a = null;
+  }
+  connectedCallback() {
+    const href = this.getAttribute("href") || "#";
+    if (this.dataset.hasOwnProperty('canvas')) {
+        const canvasURL = this.dataset.canvas;
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}" data-canvas="${canvasURL}"><slot></slot></a>`;
+    } else {
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}"><slot></slot></a>`;
+    }
+    this._$a = this.shadowRoot.querySelector("a");
+    this._$a.addEventListener("click", e => {
+      var url = this.getAttribute('href');
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+        window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+        window.open(url, '_blank');
+      }
+    });
+  }
+  static get observedAttributes() { return ["href"]; }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      if (this._$a === null) return;
+      this._$a.setAttribute("href", newValue);
+    }
+  }
+}
+
+customElements.define("a-no-proxy", AnchorNoProxy);
+
+class NoProxy extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+      	window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+      	window.open(this.href, '_blank');
+      }
+    });
+  }
+}
+
+customElements.define("no-proxy", NoProxy, { extends: "a" });
+
+class ConfirmLink extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      const result = confirm(`Are you sure you want to go to '${this.href}'?`);
+      if (!result) e.preventDefault();
+    });
+  }
+}
+
+customElements.define("confirm-link", ConfirmLink, { extends: "a" });
+
+</script>
+
+<!-- begin _includes/seo.html --><title>Assignment 9 - Machine Learning Spring 2026 @ Olin College</title>
+<meta name="description" content="Website">
+
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Machine Learning Spring 2026 @ Olin College">
+<meta property="og:title" content="Assignment 9">
+<meta property="og:url" content="/assignments/assignment09/assignment09.html">
+
+
+  <meta property="og:description" content="Website">
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="canonical" href="/assignments/assignment09/assignment09.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Machine Learning Spring 2026 @ Olin College Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  // Render Mermaid first, from untouched source.
+  mermaid.initialize({ startOnLoad: false });
+  await mermaid.run(); // renders all .mermaid blocks
+
+  // render KaTeX
+  renderMathInElement(document.body, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+    throwOnError: false,
+  });
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showSolutions = urlParams.get('showSolutions');
+    const showAllSolutions = urlParams.get('showAllSolutions');
+    const divs = document.querySelectorAll('button.togglebutton');
+
+    if (showSolutions == 'true') {
+        // Loop through the selected divs and manipulate them
+        divs.forEach(div => {
+            div.removeAttribute('hidden');
+        });
+    }
+
+    const solutionDivs = document.querySelectorAll('[id^=solution]');
+    const subpartSolutionDivs = document.querySelectorAll('[id^=subpartsolution]');
+
+    if (showAllSolutions == 'true') {
+        solutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+
+        subpartSolutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+    }
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<style>
+:root {
+    --box-bg-color: #fff; /* Default background color */
+}
+
+.homework-box {
+    background-color: var(--box-bg-color);
+    border: 2px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+}
+
+.homework-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.homework-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* Handle missing or empty src attribute */
+.homework-icon[src=""],
+.homework-icon:not([src]) {
+    content: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Games_for_Learning_%2827470%29_-_The_Noun_Project.svg');
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.homework-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.homework-content {
+    font-size: 16px;
+    color: #333;
+}
+</style>
+
+<style>
+.solution {
+    display: none; /* Hide solutions by default */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-left: 4px solid #007bff;
+    margin-top: 10px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.toggle-button.hide-solution {
+    background-color: #dc3545; /* Red background for hide button */
+}
+
+img.mermaid {
+     max-width:500px;
+     text-align: center;
+}
+
+</style>
+
+<div style="display:none;">
+$
+\newcommand{\mlvec}[1]{\mathbf{#1}}
+\newcommand{\mlmat}[1]{\mathbf{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\DeclareMathOperator*{\argmin}{arg\,min\,}
+$
+</div>
+
+  </head>
+
+  <body class="layout--problemset">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="https://qeacourse.github.io/RoboNinjaWarrior/website_graphics/olinlogo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Machine Learning Spring 2026 @ Olin College
+          
+        </a>
+        <ul class="visible-links"></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Assignment 9">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Assignment 9
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+	      
+                <ul class="toc__menu">
+  <li><a href="#learning-objectives">Learning Objectives</a></li>
+  <li><a href="#neural-networks-motivation">Neural Networks Motivation</a></li>
+  <li><a href="#neural-networks-as-stacked-logistic-regression-models">Neural Networks as Stacked Logistic Regression Models</a></li>
+  <li><a href="#neural-networks-in-pytorch">Neural Networks in Pytorch</a></li>
+  <li><a href="#dataset-exploration">Dataset exploration</a></li>
+</ul>
+	      	
+            </nav>
+          </aside>
+        
+        <h1 id="learning-objectives">Learning Objectives</h1>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #C6EBD5;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-brain"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Learning Objectives</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<ul>
+  <li>Learn about multi-layer perceptrons (MLPs)</li>
+  <li>Implement an MLP in Pytorch</li>
+  <li>Understand how a multi-layer network can solve problems without the need for feature engineering.</li>
+</ul>
+
+	</div>
+</div>
+
+<h1 id="neural-networks-motivation">Neural Networks Motivation</h1>
+
+<p>We’re going to start out our journey into neural networks by revisiting the Titanic dataset that we saw a couple of classes ago.  The exercises are embedded within <a href="https://colab.research.google.com/drive/1lYHsuQ17QuVOcot9ivynM6MFKQry1Xnw?usp=sharing">assignment 9 Colab notebook part 1</a>.  Go through those exercises, and then check back to unpack things further.</p>
+
+<h1 id="neural-networks-as-stacked-logistic-regression-models">Neural Networks as Stacked Logistic Regression Models</h1>
+
+<p>Now that you’ve seen a neural network in action, we’ll be digging into how a neural network works.  The presentation will be specific to a particular type of neural network that we used in the companion notebook known as a multilayer perceptron (MLP), but the main ideas generalize to many other types of networks.  While the name MLP might be a bit intimidating, what we’ll see in just a bit is that an MLP is nothing more than some logistic regression models stacked on top of each other!</p>
+
+<p>Thinking back to the Colab notebook, we observed that the features in the original dataset <em>age</em> and <em>sex</em> were not conducive to predicting whether someone would survive.  We showed that by augmenting the input features with a column called <em>is young male</em> that captured whether or not a person was young <em>and</em> male, that the algorithm could effectively learn the task.  The fundamental idea of a neural network is that the network automatically constructs useful representations of the input data <em>as a part of the learning process</em>.</p>
+
+<p>Before moving on, let’s show some diagrams that contrast these approaches.  First we’ll show the logistic regression model that we applied in the notebook.</p>
+
+<div class="mermaid">
+flowchart BT
+id1["age"]
+id2["male"]
+id3["is young male"]
+id4["1"]
+id5["$$p(survival) = 1/(1+e^{-s})~~~~$$"]
+id6["$$s = w_1 \text{age} + w_2 \text{male} + w_3 \text{is young male} + w_4~~~$$"]
+id1 --"$$w_1$$"--&gt; id6
+id2 --"$$w_2$$"--&gt; id6
+id3 --"$$w_3$$"--&gt; id6
+id4 --"$$w_4$$"--&gt; id6
+id6 --&gt; id5
+</div>
+
+<p>A few notes here:</p>
+<ul>
+  <li>Instead of putting the weights (e.g., $w_1$) as separate boxes (which we’ve done when computing partial derivatives), here we are putting them on the arrows between the features and the $s$.  This is a common way of writing the architecture for neural networks, and we want you to be familiar with it.  If you prefer to think of a separate box for each weight connecting to $s$, that is fine too.</li>
+  <li>To be consistent with the notebook, we are using a variable that takes on 1 if the sex of the passenger is male (this is different than what we did a few classes ago when we used 1 for female).</li>
+</ul>
+
+<p>Notice how we had to manually introduce the feature <em>is young male</em> in order for the logistic regression model to utilize it to make its prediction.  Before giving you the equivalent figure for the multi-layer perceptron, let’s look at a little bit more cartoonish version of the multi-layer perceptron.  This version will leave off the math and the particular notation we are using.  Once you have a good sense of what this model is doing, we will draw a diagram to represent the multi-layer perceptron that you met in the notebook.  If you are looking for more information on how to think about MLPs, check out the 3B1B videos we linked previously.</p>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #FFD1DC;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-external-link-alt"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">External Resources</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<p>Here are some additional resources that explain the concept of a multi-layer perceptron.  If the explanations we give below are not working for you, consider checking out some of these.  <strong>You do not need to consult these resources if you feel like our explanations are working well for you.</strong></p>
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=aircAruvnKk">3B1B: What is a neural network?</a></li>
+  <li><a href="https://adamharley.com/nn_vis/mlp/2d.html">2D fully connected network visualization</a></li>
+</ul>
+
+	</div>
+</div>
+
+<div class="mermaid">
+flowchart BT
+id1["age"]
+id2["male"]
+id4["1"]
+id10["$$p(survival) = 1/(1+e^{-s_3})~~~~$$"]
+id6["$$s_1 = w_{1,1} \text{age} + w_{1,2} \text{male} + w_{1,3}~~~$$"]
+id8["$$s_2 = w_{2,1} \text{age} + w_{2,2} \text{male} + w_{2,3}~~~$$"]
+id7["$$h_1 = 1/(1+e^{-s_1})$$"]
+id9["$$h_2 = 1/(1+e^{-s_2})$$"]
+id11["1"]
+id12["$$s_3 = w_{3,1} h_1 + w_{3,2} h_2 + w_{3,3}$$"]
+id1 --"$$w_{1,1}$$"--&gt; id6
+id2 --"$$w_{1,2}$$"--&gt; id6
+id4 --"$$w_{1,3}$$"--&gt; id6
+id1 --"$$w_{2,1}$$"--&gt; id8
+id2 --"$$w_{2,2}$$"--&gt; id8
+id4 --"$$w_{2,3}$$"--&gt; id8
+id6 --&gt; id7
+id8 --&gt; id9
+id7 --"$$w_{3,1}$$"--&gt; id12
+id9 --"$$w_{3,2}$$"--&gt; id12
+id11 --"$$w_{3,3}$$"--&gt; id12
+id12 --&gt; id10
+</div>
+
+<p>Oh no! Our notation has gotten more complicated.  Notice here that we are using subscripts to differentiate between our various summation nodes ($s_1$ versus $s_2$).  We are also using $w_{i,j}$ to refer to weight that corresponds to the $i$th summation node and the $j$th feature (e.g., $w_{1,2}$ tell us how much the feature <em>age</em> influences $s_2$).</p>
+
+<p>Input data (in this case we just use age, male, and a bias term) are propagated via a set of connection weights to a set of hidden representations ($h_1$ and $h_2$).  These hidden representations are propagated via another set of a connection weights to the output of the network.   In the companion notebook we showed that for the Titanic dataset, the network learned two hidden representations: one that seemed to encode <em>is young male</em> and the another that encoded sex.  Of particular importance is that we did not have to manually introduce the <em>is young male</em> feature.</p>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 1</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Before going on, let’s make sure you have a firm handle on what’s being represented in the figure above.</p>
+<ul>
+  <li>Just as in logistic regression, we will try to tune the weights to fit the data.  How many weights are there to tune in this network?</li>
+  <li>While the figure looks pretty crazy, it has a lot of similarities with the logistic regression model.  Where does the logistic regression model show up in the figure?</li>
+</ul>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-1&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-1" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<ul>
+  <li>There are a total of 9 weights in the network.  There are 6 connecting the 3 input units to the 2 hidden summation units.  There are another 3 connecting the 1 output summation unit.</li>
+  <li>There are three different logistic regression models represented.  There is one going from the inputs to the $s_1$.  There is another going from the inputs to $s_2$.  There is a third going from the hidden units ($h_1$ and $h_2$) to $s_3$.  The models are connected together such that the two lower logistic models feed into the higher-level one.</li>
+</ul>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 2</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>For each of the 3 behavors described below (questions a, b, and c), determine reasonable values for the weights in this network ($w_{1,1}, w_{1,2}, w_{1,3}, w_{2,1}, w_{2,2}, w_{2,3}, w_{3,1}, w_{3,2}, w_{3,3}$) so that the MLP behaves as described. You will not need to use any training data except general knowledge that a person’s reported sex is recorded as 0 or 1 and age is within a set of reasonable numbers (this question is about testing your understanding of the model itself).  Recall that the first input to the model is the passenger’s age, the second is a binary variable that is 1 if the passenger is male and 0 if female, and the third is always 1.</p>
+
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>$h_1$ encodes whether or not the passenger is female (i.e., it should take a value close to 1 when the passenger is female and close to 0 when the passenger is male).</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-41&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-41" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>Setting $w_{1,2} = -10$, $w_{1,1} = 0$, and $w_{1,3} = 5$ will do the trick.  If the passenger is male then $h_1 = \sigma(-10 + 5) = \sigma(-5) = 0.0067$ and if the passenger is female then $h_1 = \sigma(5) = 0.9933$</p>
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>$h_2$ encodes whether or not the passenger is a young male (i.e., it should take a value close to 1 when the passenger is male under the age of say 5 and close to 0 otherwise).</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-42&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-42" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>Setting $w_{2,2} = 15$, $w_{2,1} = -1$, and $w_{2,3} = -10$ will do the trick.  If the passenger is female and one years-old $h_2 = \sigma(-10 - 1) = \sigma(-11) \approx 0$ (any older female passengers will have even lower values. and if the passenger is male and 1 years-old then $h_2 = \sigma(15 - 1 - 10) = \sigma(4) = 0.982$.  A four year old male would have $h_2 = \sigma(15 - 4 - 10) = \sigma(1) = 0.731$.  An older male (e.g., a 10 year old) would have $h_2 = \sigma(15 - 10 - 10) = \sigma(-5) = 0.0067$</p>
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part C</p>
+
+<p>$p(\text{suvival})$ should be close to 1 (i.e., predict survival) when the passenger is female \emph{or} a male under the age of 5 and close to 0 otherwise.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-43&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-43" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>Set $w_{3,1} = 2$ and $w_{3,2} = 2$ and $w_{3,3} = -1$.  That way if either $h_1$ or $h_2$ are close to 1, then $p(\text{suvival}) \approx \sigma(1) = 0.73$.</p>
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<p>Believe it or not, computing these weights by hand was fairly common before we had algorithms for automatically tuning weights from data.  The reason for this was that early techniques for learning the weights were very inefficient and often unable to converge to good solutions.  By now you’ve seen how to tune these weights using gradient descent for a logistic regresion model, and given what we’ve learned from implementing the micrograd framework, you probably suspect that the same approach could be used here.</p>
+
+<h1 id="neural-networks-in-pytorch">Neural Networks in Pytorch</h1>
+
+<p>Next, we’ll go back over to Colab to show how we can tune these weights automatically using pytorch.  Here is a listing of what you’ll do in this notebook.</p>
+<ul>
+  <li>You’ll implement a multilayer perceptron to recognize handwritten digits (similar to <a href="https://adamharley.com/nn_vis/mlp/2d.html">this previously linked example</a>).</li>
+  <li>You’ll see how overfitting can become an issue for more complex networks</li>
+  <li>We’ll introduce (at a very high-level) three methods for dealing with overfitting.</li>
+</ul>
+
+<p>Okay, back to <a href="https://colab.research.google.com/drive/1U6W7j52wZRmWWn4-bB1w8rgJGnItbsaw?usp=sharing">Colab for round 2</a>.
+But don’t forget about the stuff below!</p>
+
+<h1 id="dataset-exploration">Dataset exploration</h1>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 3</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Shortly, we will begin a mini-project in which you’ll perform classification on an existing dataset. We’d like you to take 10-20 minutes to explore potential datasets that you might be interested in and add one to our group slide deck (so others might use it too). The slide deck is linked on Canvas under this assignment on the home page. As you search, think about the size and type of the data (you could always take a small subset of an existing dataset).</p>
+
+<p>There are lots of data repositories to explore.  <a href="https://www.kaggle.com/datasets">Kaggle</a>, <a href="https://huggingface.co/datasets">Hugging Face</a>, and <a href="https://openml.org/search?type=data&amp;sort=runs&amp;status=active">OpenML.org</a> might be good places to start. You can often filter by the type of data as well as the topic.</p>
+
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-3&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-3" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2026 Machine Learning Spring 2026 @ Olin College.</div>
+
+      </footer>
+    </div>
+
+    <script src="/assets/js/copyCode.js"></script>
+
+
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

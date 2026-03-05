@@ -1,0 +1,837 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.17.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<script>
+class AnchorNoProxy extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._$a = null;
+  }
+  connectedCallback() {
+    const href = this.getAttribute("href") || "#";
+    if (this.dataset.hasOwnProperty('canvas')) {
+        const canvasURL = this.dataset.canvas;
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}" data-canvas="${canvasURL}"><slot></slot></a>`;
+    } else {
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}"><slot></slot></a>`;
+    }
+    this._$a = this.shadowRoot.querySelector("a");
+    this._$a.addEventListener("click", e => {
+      var url = this.getAttribute('href');
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+        window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+        window.open(url, '_blank');
+      }
+    });
+  }
+  static get observedAttributes() { return ["href"]; }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      if (this._$a === null) return;
+      this._$a.setAttribute("href", newValue);
+    }
+  }
+}
+
+customElements.define("a-no-proxy", AnchorNoProxy);
+
+class NoProxy extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+      	window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+      	window.open(this.href, '_blank');
+      }
+    });
+  }
+}
+
+customElements.define("no-proxy", NoProxy, { extends: "a" });
+
+class ConfirmLink extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      const result = confirm(`Are you sure you want to go to '${this.href}'?`);
+      if (!result) e.preventDefault();
+    });
+  }
+}
+
+customElements.define("confirm-link", ConfirmLink, { extends: "a" });
+
+</script>
+
+<!-- begin _includes/seo.html --><title>Day 12: Project Shareout and Starting Text as Data - Machine Learning Spring 2026 @ Olin College</title>
+<meta name="description" content="Website">
+
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Machine Learning Spring 2026 @ Olin College">
+<meta property="og:title" content="Day 12: Project Shareout and Starting Text as Data">
+<meta property="og:url" content="/activities/day12.html">
+
+
+  <meta property="og:description" content="Website">
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="canonical" href="/activities/day12.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Machine Learning Spring 2026 @ Olin College Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  // Render Mermaid first, from untouched source.
+  mermaid.initialize({ startOnLoad: false });
+  await mermaid.run(); // renders all .mermaid blocks
+
+  // render KaTeX
+  renderMathInElement(document.body, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+    throwOnError: false,
+  });
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showSolutions = urlParams.get('showSolutions');
+    const showAllSolutions = urlParams.get('showAllSolutions');
+    const divs = document.querySelectorAll('button.togglebutton');
+
+    if (showSolutions == 'true') {
+        // Loop through the selected divs and manipulate them
+        divs.forEach(div => {
+            div.removeAttribute('hidden');
+        });
+    }
+
+    const solutionDivs = document.querySelectorAll('[id^=solution]');
+    const subpartSolutionDivs = document.querySelectorAll('[id^=subpartsolution]');
+
+    if (showAllSolutions == 'true') {
+        solutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+
+        subpartSolutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+    }
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<style>
+:root {
+    --box-bg-color: #fff; /* Default background color */
+}
+
+.homework-box {
+    background-color: var(--box-bg-color);
+    border: 2px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+}
+
+.homework-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.homework-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* Handle missing or empty src attribute */
+.homework-icon[src=""],
+.homework-icon:not([src]) {
+    content: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Games_for_Learning_%2827470%29_-_The_Noun_Project.svg');
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.homework-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.homework-content {
+    font-size: 16px;
+    color: #333;
+}
+</style>
+
+<style>
+.solution {
+    display: none; /* Hide solutions by default */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-left: 4px solid #007bff;
+    margin-top: 10px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.toggle-button.hide-solution {
+    background-color: #dc3545; /* Red background for hide button */
+}
+
+img.mermaid {
+     max-width:500px;
+     text-align: center;
+}
+
+</style>
+
+<div style="display:none;">
+$
+\newcommand{\mlvec}[1]{\mathbf{#1}}
+\newcommand{\mlmat}[1]{\mathbf{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\DeclareMathOperator*{\argmin}{arg\,min\,}
+$
+</div>
+
+  </head>
+
+  <body class="layout--problemset">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="https://qeacourse.github.io/RoboNinjaWarrior/website_graphics/olinlogo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Machine Learning Spring 2026 @ Olin College
+          
+        </a>
+        <ul class="visible-links"></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Day 12: Project Shareout and Starting Text as Data">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Day 12: Project Shareout and Starting Text as Data
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+	      
+                <ul class="toc__menu">
+  <li><a href="#">Agenda</a></li>
+  <li><a href="#share-out-about-small-data-projects">Share out about small data projects!</a></li>
+  <li><a href="#key-takeaways-from-the-mini-project">Key takeaways from the mini-project</a></li>
+  <li><a href="#key-concepts-in-learning-as-optimization">Key concepts in Learning as Optimization</a></li>
+  <li><a href="#important-problems-in-the-field-of-text-processing">Important Problems in the Field of Text Processing</a></li>
+  <li><a href="#text-as-data">Text as Data</a></li>
+  <li><a href="#vectorizing-text-two-ways">Vectorizing Text Two Ways</a></li>
+  <li><a href="#motivating-example-for-our-next-assignment">Motivating Example for Our Next Assignment</a></li>
+</ul>
+	      	
+            </nav>
+          </aside>
+        
+        
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #4c00b0;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #FFFFFF;">
+        <i class="fas fa-list"></i>
+</div>
+	<h1 style="font-size: xx-large; font-weight: 900; color: white;">Agenda</h1>
+    </div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<ul>
+  <li>3:45-4:05pm: Share out about small data projects!</li>
+  <li>4:05-4:15pm: Key takeaways from the project</li>
+  <li>4:15-4:35pm: Key concepts in Learning as Optimization</li>
+  <li>4:35-5:25pm: Shifting into text as data</li>
+</ul>
+
+	</div>
+</div>
+
+<h1 id="share-out-about-small-data-projects">Share out about small data projects!</h1>
+
+<p>We want to celebrate and share about your small data mini-projects. Hooray, you did it! We’ll do a little share-out so that you can learn from each other and give high fives!</p>
+
+<h2 id="share-at-tables">Share at tables</h2>
+
+<p>Let’s start out by sharing what you did with the folks around you.  Take about 2 minutes each to go over what you did for the project and how it turned out.</p>
+
+<h2 id="if-you-feel-inclined-step-up-to-the-front">If you feel inclined, step up to the front</h2>
+
+<p>If you have something you want to show the class (could be something you are proud of, a hard fought lesson, advice, etc.), please jump up and connect to the projector.</p>
+
+<h1 id="key-takeaways-from-the-mini-project">Key takeaways from the mini-project</h1>
+
+<p>Let’s mix up the seating.  Please sit with people you don’t normally sit with.  As a group make a list of key takeaways for this project.  Some good prompts would be:</p>
+
+<ol>
+  <li>New things I learned through this project are…</li>
+  <li>I solidified my knowledge of…</li>
+  <li>Next time I use machine learning I will be sure to…</li>
+</ol>
+
+<p>Take about 5 minutes for this in groups and then we’ll do a 5 minute share out.</p>
+
+<h1 id="key-concepts-in-learning-as-optimization">Key concepts in Learning as Optimization</h1>
+
+<p>Before we turn to the next unit of the course, let’s take stock of what we’ve learned in this past module 
+(Learning as Optimization).  We’d like you to create a concept map of the main ideas in the learning as optimization 
+module.  From this concept map, please make a list of what you think the key takeaways are from this module.  For 
+your reference, we’ve made our own list (see this <a href="../assignments/assignment10/LearningAsOptimizationTakeaways">Learning As Optimization Takeaways</a> for details about what we expect).</p>
+
+<h1 id="important-problems-in-the-field-of-text-processing">Important Problems in the Field of Text Processing</h1>
+
+<p>Before we get into how to process text, let’s ask <em>why</em> we might want to process text.  Perhaps this seems like a
+silly question given the fact that everywhere you turn these days folk are talking about processing text with large<br />
+language models (LLMs).  We’re going to go over a few of the specific problems that arise in a field called Natural
+Language Processing (or NLP for short).  NLP is a field concerned with, not surprisingly, processing and making 
+sense of natural language.  Don’t let the term “natural language” confuse you, all we mean here is that we want to 
+be able to process text that is written in natural form (i.e., how humans communicate).  In this case the world 
+“natural” might be seen as a contrast to the notion of processing text that is constructed in some specific way as 
+to be easily interpretable by a computer (e.g., a programming language is a good example).</p>
+
+<p>Here are some examples (not even close to an exhaustive list) of NLP problems that are commonly studied in the field.</p>
+
+<ul>
+  <li><strong>Machine translation:</strong> translating text from one language to another.</li>
+  <li><strong>Text completion:</strong> given the beginning of a piece of text, complete it (this is at the heart of LLMs)</li>
+  <li><strong>Question answering:</strong> given a question, answer it in natural language (again this is a big part of LLMs)</li>
+  <li><strong>Named entity recognition:</strong> “seeks to locate and classify named entities mentioned in unstructured text into pre-defined categories such as person names, organizations, locations, medical codes, time expressions, quantities, monetary values, percentages, etc.” (<a href="https://en.wikipedia.org/wiki/Named-entity_recognition">source</a>)</li>
+  <li><strong>Sentence parsing:</strong> given a sentence, determine parts of speech and how they relate to each other</li>
+  <li><strong>Sentiment analysis:</strong> given a sentence, determine whether the sentiment contained is positive or negative (this could be generalized to emotion detection or transferred to thinking about other types of text classification, e.g., spam filters for email).</li>
+</ul>
+
+<h2 id="text-processing-beyond-natural-language">Text Processing Beyond Natural Language</h2>
+
+<p>Many of the same techniques we will be learning about can be used to process text data other than natural language.<br />
+Examples of this sort of text data could be genomic sequences (where each symbol in the sequence consists of 
+nucleotides A, C, T, and G), amino acid chains (where each symbol is one of the 20 amino acids present in the human 
+body), structured text (e.g., Python code), etc.  For example, the Google’s DeepMind team’s <a href="https://www.nature.com/articles/d41586-024-03214-7">AlphaFold program for protein structure prediction just led to a Nobel prize in chemistry</a>.  <a href="https://www.nature.com/articles/s41586-021-03819-2">AlphaFold</a> predicts protein structure from an Amino acid chain.  We won’t be going into this sort of text processing in this module (although some of the methods we will learn could be adapted fairly easily).  If you are interested in the idea of processing non-linguistic text, this might be a fruitful topic for a final project.</p>
+
+<h1 id="text-as-data">Text as Data</h1>
+
+<p>The theme of this module is text as data.  In this module we will begin to explore how we can use machine learning
+approaches to process text in order to solve problems (e.g., text classification or language translation).<br />
+Throughout this module, we will learn different methods to convert text to numbers that can be operated upon using
+the machine learning techniques we learned about in the last module (e.g., logistic regression and MLPs).</p>
+
+<h2 id="key-properties">Key Properties</h2>
+
+<p>Before we dive into some of the key applications of machine learning for text processing, let’s take some time to
+think about what makes processing text different than much of the data we’ve looked at thus far.</p>
+
+<h3 id="text-consists-of-symbols">Text consists of symbols</h3>
+
+<p>Pieces of text are comprised of symbols.  For example, the text you are reading right now consists of symbols that
+include letters, numbers, punctuation, and other special characters.  Perhaps the most important distinction for us
+as machine learning practitioners is that these symbols do not necessarily have a meaningful numerical
+representation that we can use for learning.  As we move forward in this module, we’re going to learn different
+methods for changing these symbols into useful numerical representations so that we can use techniques like logistic
+regression and MLPs for further processing.  It’s also worth mentioning that when representing text we can also
+choose the symbols that we use.  Some models treat each letter as an individual symbol, and others treat each word
+as a symbol.  Other models treat parts of words as symbols.  We’ll be digging into all of this in a few assignments.</p>
+
+<h3 id="text-has-sequential-structure">Text has sequential structure</h3>
+
+<p>When we first met the supervised learning problem, we represented our input to the model as a d-dimensional vector
+$\mathbf{x}$.  Each of the dimensions of this vector represented some characteristic of the data.  In the logistic
+regression model and the MLP, each dimension of $\mathbf{x}$ was treated more-or-less independently.  We did not
+assume any specific relationship between $x_i$ and $x_j$ (we could just as easily have shuffled the dimensions of
+the data and our learning approaches wouldn’t have behaved any differently).  When processing text, we need to
+consider that pieces of text have sequential structure.  The order of the symbols matters.  Our first attempts (in
+this assignment) to map machine learning onto text processing will not do a great job encoding this sequential
+structure, but as we move through the module we will begin to represent this sequential structure in important ways.</p>
+
+<h3 id="text-has-variable-length">Text has variable length</h3>
+
+<p>Again, thinking back to our input vector $\mathbf{x}$, it had a fixed number of dimensions (we used $d$ to refer to
+the number of dimensions).  Pieces of text consist of sequences of symbols <em>of variable length</em>.  As a concrete
+example, later in this document you’ll learn about sentiment analysis (predicting if a piece of text is positive or
+negative) from text.  The individual pieces of text will contain varying numbers of symbols.  Our machine learning
+methods must handle this variability, and so far it’s not obvious how we can make this happen (but we’ll see one way
+by the end of this assignment).</p>
+
+<h1 id="vectorizing-text-two-ways">Vectorizing Text Two Ways</h1>
+
+<h2 id="bag-of-words">Bag of Words</h2>
+
+<p>Next, we’re going to learn about our first technique for adapting the machine learning approaches from the previous 
+module to processing text.  In doing so, we’re going to find ways of dealing with some of the unique features of 
+text that initially might seem to make text incompatible with the techniques we’ve learned about.  Our first 
+technique of the module is called “bag of words,” and it deals with two important challenges we’ve already discussed 
+in using machine learning methods with text.  First, it converts the symbols in a piece of text into a numerical 
+representation.  Second, the technique is able to handle pieces of text that are variable in length.  We hope you 
+will enjoy these great external resources for learning about bag of words.</p>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #FFD1DC;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-external-link-alt"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">External Resources</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<p>Let’s learn about bag of words!  Begin by watching
+<a href="https://www.youtube.com/embed/pF9wCgUbRtc?si=zd1AYDQTJifqLtcZ">a video from IBM called “What is Bag of Words?”</a>.<br />
+Towards the end, this video gets into two more advanced topics that we’ll be digging into shortly.  The first is
+tf-idf and you’ll learn about that in the notebook.  The second is the idea of word embeddings (or word2vec), and
+you’ll see that in the assignment after this one.  We point this out since we want you to focus on the bag of words
+content and avoid getting thrown off by this other content.  If you want one more (shorter video), we also recommend
+<a href="https://www.youtube.com/embed/kLMhePA3BiY?si=MEfYE_SyhzkGBnch">this video from Socratica</a>.</p>
+
+	</div>
+</div>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 1</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>As a quick check of your understanding, encode the following three pieces of text using bag of words.  What would
+you need to do to normalize the data?  What does it mean that the bag of words is a sparse representation?  How do
+you see that in your solution to the exercise?</p>
+
+<ol>
+  <li>goodnight moon</li>
+  <li>goodnight cow jumping over the moon</li>
+  <li>and a little toy house and a young mouse</li>
+  <li>and goodnight mouse</li>
+</ol>
+
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-1&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-1" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>If we examine the texts as a whole, we can identify the unique words that occur and assign each word to a dimension
+in our bag of words vector.  As long as we’re consistent in how we do so, It doesn’t matter how we assign words to
+vector dimensions (we could shuffle the rows of the table below, and we would still have a valid bag of words
+representation).  Here is what the sentences could look like in bag of words form.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>dimension</th>
+      <th>word</th>
+      <th>text 1</th>
+      <th>text 2</th>
+      <th>text 3</th>
+      <th>text 4</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>goodnight</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>moon</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>cow</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>jumping</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>over</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>the</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>and</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>a</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>little</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>toy</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>house</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>young</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>mouse</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>If we were to normalize these representations, we would divide each column by the sum of the column (i.e., the total
+number of words in each piece of text).</p>
+
+<p>The bag of words representation is sparse as most of the entries in the table are 0.  If we had a larger vocabulary
+the sparsity would be even more apparent (a higher proportion of entries that are 0).</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+<h1 id="motivating-example-for-our-next-assignment">Motivating Example for Our Next Assignment</h1>
+
+<p>We’ll be going over the concept of word embeddings using a combination of a mini-lecture and <a href="https://colab.research.google.com/drive/1a-P0IEZs-wV4VZpdznaXpGJU_qJipqL_?usp=sharing">a Colab notebook</a>.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2026 Machine Learning Spring 2026 @ Olin College.</div>
+
+      </footer>
+    </div>
+
+    <script src="/assets/js/copyCode.js"></script>
+
+
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

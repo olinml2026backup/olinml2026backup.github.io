@@ -1,0 +1,723 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.17.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<script>
+class AnchorNoProxy extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._$a = null;
+  }
+  connectedCallback() {
+    const href = this.getAttribute("href") || "#";
+    if (this.dataset.hasOwnProperty('canvas')) {
+        const canvasURL = this.dataset.canvas;
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}" data-canvas="${canvasURL}"><slot></slot></a>`;
+    } else {
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}"><slot></slot></a>`;
+    }
+    this._$a = this.shadowRoot.querySelector("a");
+    this._$a.addEventListener("click", e => {
+      var url = this.getAttribute('href');
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+        window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+        window.open(url, '_blank');
+      }
+    });
+  }
+  static get observedAttributes() { return ["href"]; }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      if (this._$a === null) return;
+      this._$a.setAttribute("href", newValue);
+    }
+  }
+}
+
+customElements.define("a-no-proxy", AnchorNoProxy);
+
+class NoProxy extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+      	window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+      	window.open(this.href, '_blank');
+      }
+    });
+  }
+}
+
+customElements.define("no-proxy", NoProxy, { extends: "a" });
+
+class ConfirmLink extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      const result = confirm(`Are you sure you want to go to '${this.href}'?`);
+      if (!result) e.preventDefault();
+    });
+  }
+}
+
+customElements.define("confirm-link", ConfirmLink, { extends: "a" });
+
+</script>
+
+<!-- begin _includes/seo.html --><title>Assignment 10: Small data mini-project on classification - Machine Learning Spring 2026 @ Olin College</title>
+<meta name="description" content="Website">
+
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Machine Learning Spring 2026 @ Olin College">
+<meta property="og:title" content="Assignment 10: Small data mini-project on classification">
+<meta property="og:url" content="/assignments/assignment10/assignment10.html">
+
+
+  <meta property="og:description" content="Website">
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="canonical" href="/assignments/assignment10/assignment10.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Machine Learning Spring 2026 @ Olin College Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  // Render Mermaid first, from untouched source.
+  mermaid.initialize({ startOnLoad: false });
+  await mermaid.run(); // renders all .mermaid blocks
+
+  // render KaTeX
+  renderMathInElement(document.body, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+    throwOnError: false,
+  });
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showSolutions = urlParams.get('showSolutions');
+    const showAllSolutions = urlParams.get('showAllSolutions');
+    const divs = document.querySelectorAll('button.togglebutton');
+
+    if (showSolutions == 'true') {
+        // Loop through the selected divs and manipulate them
+        divs.forEach(div => {
+            div.removeAttribute('hidden');
+        });
+    }
+
+    const solutionDivs = document.querySelectorAll('[id^=solution]');
+    const subpartSolutionDivs = document.querySelectorAll('[id^=subpartsolution]');
+
+    if (showAllSolutions == 'true') {
+        solutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+
+        subpartSolutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+    }
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<style>
+:root {
+    --box-bg-color: #fff; /* Default background color */
+}
+
+.homework-box {
+    background-color: var(--box-bg-color);
+    border: 2px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+}
+
+.homework-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.homework-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* Handle missing or empty src attribute */
+.homework-icon[src=""],
+.homework-icon:not([src]) {
+    content: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Games_for_Learning_%2827470%29_-_The_Noun_Project.svg');
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.homework-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.homework-content {
+    font-size: 16px;
+    color: #333;
+}
+</style>
+
+<style>
+.solution {
+    display: none; /* Hide solutions by default */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-left: 4px solid #007bff;
+    margin-top: 10px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.toggle-button.hide-solution {
+    background-color: #dc3545; /* Red background for hide button */
+}
+
+img.mermaid {
+     max-width:500px;
+     text-align: center;
+}
+
+</style>
+
+<div style="display:none;">
+$
+\newcommand{\mlvec}[1]{\mathbf{#1}}
+\newcommand{\mlmat}[1]{\mathbf{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\DeclareMathOperator*{\argmin}{arg\,min\,}
+$
+</div>
+
+  </head>
+
+  <body class="layout--problemset">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="https://qeacourse.github.io/RoboNinjaWarrior/website_graphics/olinlogo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Machine Learning Spring 2026 @ Olin College
+          
+        </a>
+        <ul class="visible-links"></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Assignment 10: Small data mini-project on classification">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Assignment 10: Small data mini-project on classification
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+	      
+                <ul class="toc__menu">
+  <li><a href="#the-project-description">The project description</a></li>
+  <li><a href="#learning-objectives">Learning Objectives</a></li>
+  <li><a href="#timeline">Timeline</a></li>
+  <li><a href="#use-of-external-resources-including-peers-the-internet-and-ai">Use of external resources (including peers, the internet, and AI)</a></li>
+  <li><a href="#deliverables--assessment">Deliverables &amp; Assessment</a></li>
+  <li><a href="#appendix-a-some-questions-to-consider">Appendix A: Some questions to consider</a></li>
+  <li><a href="#appendix-b-lessons-from-those-that-have-come-before-you">Appendix B: Lessons from those that have come before you</a></li>
+  <li><a href="#appendix-c-rubrics">Appendix C: Rubrics</a></li>
+</ul>
+	      	
+            </nav>
+          </aside>
+        
+        <h1 id="the-project-description">The project description</h1>
+
+<p>You will be working solo on this one-week mini-project.</p>
+
+<p>In this assignment, you will contemplate a potential application for classification, you will implement and improve 
+upon a machine learning algorithm on a dataset in support of this application, and you will evaluate the model’s 
+performance.</p>
+
+<p>As part of this project, you will:</p>
+<ul>
+  <li>Select a “small data” dataset.
+    <ul>
+      <li>“Small data” here is to indicate that you don’t need to choose a giant data set (too much for Colab to hold in 
+memory). The goal is to learn about the machine learning process, building your skills and intuition. There is 
+no requirement to get high accuracy. That said, you do need a fair number of data points (exemplars) to<br />
+meaningfully train your network. This varies by the size of your network and the number of parameters. (You’ll 
+be in rough shape if you have fewer than 30 exemplars per category even if your model has a small number of 
+parameters.)</li>
+      <li>Steer clear of datasets that use text or image-based features.  We will be diving into those in later parts of 
+the class, so you should save your explorations of these features for the appropriate time.</li>
+    </ul>
+  </li>
+  <li>Document the important considerations for your application. For example:
+    <ul>
+      <li>What data are available for training?</li>
+      <li>How well would the algorithm need to work to responsibly create value?</li>
+      <li>How could the algorithm and application be tested (beyond the testing you choose to implement)?</li>
+      <li>What are the implications of this application in the world; who are the stakeholders; what are the risks; how 
+(if at all) could they be mitigated?</li>
+    </ul>
+  </li>
+  <li>Build and iterate on a classification model as a step toward this application.
+    <ul>
+      <li>We don’t expect you to build the entire application, just to work toward implementing an early version of an 
+algorithm that could be used for this application. Your dataset doesn’t need to be sufficient (e.g.,  big or 
+broad enough) to actually make the application.</li>
+      <li>The iteration aspect is important. You will build and test multiple versions of your model and document the effects of these changes. You will likely manipulate a parameter and see how your results change at different values of that parameter.
+        <ul>
+          <li>For full credit, you should evaluate at least one major changes to your model (e.g., comparison of different 
+types of models; manipulate the number of nodes in a hidden layer; manipulate the number of hidden layers; 
+experiment with preprocessing or data augmentation techniques; experiment with different activation functions such as relu, sigmoid, etc.)</li>
+        </ul>
+      </li>
+      <li>You can use pre-built libraries like pytorch. It’s highly likely that you will use a neural network, but not required. Please talk with us if you plan on using a different type of model.</li>
+    </ul>
+  </li>
+  <li>Visualize key aspects of your data/model. Include at least 3 meaningful visualizations in your report with clear labeling and a discussion of their meaning (though you’ll likely want more than three visualizations).
+    <ul>
+      <li>You’ll probably find it valuable to visualize many aspects of the data and model as you work. This is helpful in sanity checking and can give good insight into how the model is working.</li>
+      <li>It’s likely that you’ll visualize: some things about your data (before even making the model); a graph that shows the loss of your model as during the training process (see figures and caption at the end of <a href="https://livebook.manning.com/concept/deep-learning/training-loss">this page</a>); changes in some key metrics as you manipulate a parameter (e.g., number of hidden layers); comparison of key metrics for different versions of your model; final training and testing metrics.</li>
+    </ul>
+  </li>
+  <li>Test and evaluate your model. This will likely include accuracy and other key metrics on training and test sets. Depending on your application, you may consider testing with additional data from another source (e.g., data you collect; another internet dataset that’s similar; simulated data based on theory). You will also evaluate the effectiveness of this model for your specific application and describe the limitations of your current model and data.
+    <ul>
+      <li>Your accuracy and other metrics of your actual model don’t have to be good enough for your application. The goal here is to iterate on your model, measure its effectiveness, and reflect on this in the context of an application.</li>
+    </ul>
+  </li>
+  <li>Document your final analysis pipeline for transparency. (A simplified version that does not need to include every parameter, visualization, or tweak that you tried.) It should be well-organized and easy to follow (this takes time, so budget for it).</li>
+</ul>
+
+<h1 id="learning-objectives">Learning Objectives</h1>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #C6EBD5;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-brain"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Learning Objectives</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<p>This mini-project relates to all of the intended learning outcomes of this course:</p>
+<ul>
+  <li>Execute the iterative machine learning workflow of model design, fitting to training data, testing, and interpretation in order to be able to successfully apply machine learning techniques in specific contexts.
+    <ul>
+      <li>Yup, definitely this one.</li>
+    </ul>
+  </li>
+  <li>Successfully implement machine learning algorithms in Python (both by using only minimal external libraries and by leveraging state-of-the-art machine learning libraries).
+    <ul>
+      <li>You can use libraries (e.g., PyTorch)</li>
+    </ul>
+  </li>
+  <li>Consider the potential impacts of a machine learning system when deployed in a real-world context and make design decisions to mitigate potential harmful impacts.
+    <ul>
+      <li>Definitely the first part of this, and you should think about the design decisions you would make.</li>
+    </ul>
+  </li>
+  <li>Understand a variety of machine learning techniques from both a mathematical and algorithmic perspective.
+    <ul>
+      <li>This project is not focused on the math, but in the past, this kind of project was where conceptual things clicked for several students (see Appendix).</li>
+    </ul>
+  </li>
+</ul>
+
+	</div>
+</div>
+
+<h1 id="timeline">Timeline</h1>
+
+<p>The project launches on February 26th and will be due March 3rd. 
+While this is a relatively short time (1 week), we think there will still be time for you to explore your dataset / 
+application and writeup your findings.</p>
+
+<h1 id="use-of-external-resources-including-peers-the-internet-and-ai">Use of external resources (including peers, the internet, and AI)</h1>
+<p>You should lead your own project, and by “lead”, we mean that you should be the active thinker and doer of the work. 
+This is how you build your skills and intuition. You should write and understand the code and text in your project.</p>
+
+<p>We are extending our trust to you (we will not run your report through a plagiarism checker), and we expect that you 
+will follow the
+<a href="https://www.olin.edu/student-life-student-affairs-and-resources/student-rights-responsibilities">Olin Honor Code</a>. 
+The values of integrity and respect for others seem most directly relevant. We expect that your submitted work 
+represents you own skills and understanding. However, we also recognize that this is a fuzzy thing to navigate. 
+We’ve tried to articulate some guidelines here for equity and transparency, and we invite open discussion about what 
+is appropriate and fair. We can navigate this fuzzy world together (like <a href="https://en.wikipedia.org/wiki/James_and_the_Giant_Peach">James and his friends in the giant peach</a>).</p>
+
+<h2 id="peer-collaboration-students-in-this-class-or-other-humans-squirrels-and-monkeys-with-typewriters">Peer collaboration (students in this class or other humans, squirrels, and monkeys with typewriters)</h2>
+<p>We encourage collaboration and supporting each other to enhance everyone’s learning. However, it’s inappropriate to have someone else write your code for you. It is okay to talk to someone about something that you’re stuck on. It’s also okay for them to show you how they solved it. It’s not okay to mindlessly copy several lines of code or text directly from someone else’s assignment.</p>
+
+<h2 id="the-not-actually-magical-world-of-the-internet-and-artificial-intelligence">The (not actually) magical world of the internet and artificial intelligence</h2>
+<p>It’s quite likely that someone has used your dataset for a machine learning project and posted that somewhere online.
+You can use these materials to help you when you are stuck, but you should not just copy and paste large chunks of 
+code from the internet or AI (likely scraped from the internet). You do not need to turn off the auto-complete 
+functions in Colab or your IDE, but please be aware that these also make mistakes.</p>
+
+<p>You should not start this project by having AI generate your first draft; the thought process of thinking through 
+each of the steps is important to build your understanding. It is great to look at examples online that use a 
+different dataset in order to build your understanding of the process, and then to emulate that in your own code.</p>
+
+<h2 id="class-owned-editable-resources-file">Class-owned editable resources file</h2>
+
+<p>We will continue to use Slack and office hours to answer questions. However, we also know that a great deal of learning happens outside of those places. <a href="https://docs.google.com/document/d/15zNjQp32oBqaD4CY4gAsgSnkAWUs3JbTJYNRAEr1H28/edit?usp=sharing">This shared, class-owned, editable document</a> is intended to serve as a communal set of resources for troubleshooting as we figure things out together. Anyone can add to it, so as you run into problems (you will) and figure out solutions (sometimes on your own, sometimes with help), please add to this document to help others. Learning is not a zero-sum game.</p>
+
+<p>This shared document already has three years of notes from Machine Learning students in the past (some from an 
+image-focused project and one year from this same project framing), so some things may be outdated (you can delete 
+something if it no longer works or applies to this project). We also want to note that the field of machine 
+learning is constantly changing, as are things like libraries and toolboxes. It’s likely that you’ll run into something 
+that worked 4 years ago and does not work now. Please help us find and fix these things!</p>
+
+<h1 id="deliverables--assessment">Deliverables &amp; Assessment</h1>
+
+<h2 id="deliverables">Deliverables</h2>
+
+<ol>
+  <li>A clean report in notebook (.ipynb) format with thoughtful explanations of the considerations for your classification application and important highlights of your analysis. This should include in-line code and figures. This should <strong>not</strong> include every analysis and figure that you generated. Choose the important pieces of information to meet the project description and rubric. You can mention other things that you investigated in the text and include supplemental code in your repository. This is about quality, not quantity.
+    <ul>
+      <li>The submission can be an uploaded .ipynb notebook or link to a notebook on Colab (please make sure you have appropriate sharing settings selected and test with someone else so we don’t have to request access; let us know if you’d like our Colab account email addresses).</li>
+    </ul>
+  </li>
+  <li>A PDF of your clean notebook with all of the cells run and graphs appearing clearly. If you run into issues with this, try a different browser and experiment with the print function within Colab. If you have a problem and then figure something out, add it to <a href="https://docs.google.com/document/d/15zNjQp32oBqaD4CY4gAsgSnkAWUs3JbTJYNRAEr1H28/edit?usp=sharing">the shared, class-owned, editable document</a>.</li>
+</ol>
+
+<p>There are rubrics in the appendices in this document. The intention of these rubrics is to create shared expectations about the project, while also giving you lots of latitude to explore and emphasize your own learning.</p>
+
+<h2 id="assessment">Assessment</h2>
+
+<p>Assessment for this project will be based on the <strong>quality of project work</strong>, which will be assessed by the teaching team.</p>
+
+<p>At the end of the project, the teaching will assess and provide feedback on your final report. We apologize if this takes us a while, as this is a large class and we’re also redesigning many aspects of it.</p>
+
+<p>We want to acknowledge that we are all coming to this course with varying experience with machine learning. This is great, and we’re actively trying to help you all have positive learning experiences. We intend for the course not to require prior experience with machine learning to participate, learn new things, and feasibly receive a high grade. With this in mind, we want to be explicit about how we anticipate this playing out in assessment.</p>
+
+<p>With the project work and report, we will assess with a mental model of a student beginning the course with no real 
+machine learning experience. The key aspects of this assessment are described in the rubric and project description. In practice, this means that everyone could receive an A for this project, and it will be more challenging for some people than others.</p>
+
+<h1 id="appendix-a-some-questions-to-consider">Appendix A: Some questions to consider</h1>
+<p><a href="https://www.notion.so/ANN-Project-Framing-76e1b6af347f475a983487996ac9760d">These questions built from this webpage.</a></p>
+
+<ul>
+  <li>What do you want your model to be able to do?</li>
+  <li>How can you imagine your model (or an extension of it) being used in the real world? Feel free to get creative.</li>
+  <li>If those ideas came true, who might they affect? In what ways?</li>
+  <li>What measures would your model’s real-world implementers need to take to ensure its effects live up to your intentions?</li>
+  <li>What pitfalls might your model fall into, and what could you quantitatively measure to avoid those?</li>
+  <li>Why was the dataset you used to train your model created?</li>
+  <li>In what other ways could the same data be used? How do you feel about those possibilities?</li>
+  <li>How was that dataset assembled? From where was the data sourced? Who or what labeled it? If there are any elements of this process you think were either particularly well done or problematic, how so?</li>
+  <li>If your dataset contains information about people, to what degree did those people have agency over their inclusion? Do you feel that matters in this case (your application and/or for a college project)? Why or why not?</li>
+  <li>Skimming through your dataset, does anything stand out to you about representation in its contents?</li>
+  <li>Do you feel the potential use cases for this dataset justify it being created and published? Why or why not?</li>
+</ul>
+
+<h1 id="appendix-b-lessons-from-those-that-have-come-before-you">Appendix B: Lessons from those that have come before you</h1>
+
+<p>In a prior version of the class, we did a classification project using images with something called a convolutional neural network or CNN, which we’ll learn about later (the images part of this course). Here we’re doing a mini-project with simpler data, though you can use images if you want. At the end, we asked students to reflect on their project. We thought it might be helpful or entertaining to see <a href="https://drive.google.com/file/d/1z5bXMRp2Np30TTa34uQh-GBnKykWI7rJ/view?usp=sharing">what they had to say</a>.</p>
+
+<h1 id="appendix-c-rubrics">Appendix C: Rubrics</h1>
+
+<h3 id="jupyter-notebook">Jupyter Notebook</h3>
+<p>Please submit both a PDF of your Jupyter Notebook (with the code executed) and an executable Jupyter Notebook (or link to Colab with appropriate sharing set and tested) to Canvas.</p>
+
+<p>You should refer to the Project Description at the top of this document for what to include (we try to refer to that section here). Your project will be graded on the following aspects.</p>
+
+<p><strong>General</strong></p>
+
+<ol>
+  <li>The notebook is well-organized.</li>
+  <li>The notebook balances code and text well.</li>
+  <li>The notebook runs without errors in the Google CoLab environment.</li>
+  <li>The notebook is free of typos.</li>
+  <li>The notebook demonstrates good coding practices, including but not limited to docstrings, appropriate variable 
+names, helper functions to cut down on code reuse, and comments as appropriate.</li>
+  <li>The code demonstrates a significant amount of effort (roughly 2 assignments’ worth), made clear by careful 
+consideration of the data, model, and implications for the model you developed.</li>
+</ol>
+
+<p><strong>Motivation (See: Document the important considerations for your application.)</strong></p>
+
+<ol>
+  <li>It is clear what data you used.</li>
+  <li>The application of your algorithm is clear and well-motivated.</li>
+  <li>The notebook explains how well the algorithm would need to work to provide value.</li>
+  <li>The notebook explains how the algorithm is to be evaluated (how do you know it is working well?).</li>
+  <li>The notebook explains the implications of this approach (including risks and stakeholders).</li>
+</ol>
+
+<p><strong>Implementation (See: Build and iterate on a classification model as a step toward this application.)</strong></p>
+
+<ol>
+  <li>The notebook explains the dataset and the features, in text and/or graphics.</li>
+  <li>The notebook contains a classification model.</li>
+  <li>The model(s) are implemented correctly.</li>
+  <li>The notebook includes experimentation and evaluation of at least two major changes to your model (e.g., comparison of different types of models; manipulate the number of nodes in a hidden layer; manipulate the number of hidden layers; experiment with preprocessing or data augmentation techniques; experiment with different activation functions such as relu, sigmoid, etc.)</li>
+</ol>
+
+<p><strong>Interpretation and Visualization (See: Build and iterate;  Visualize key aspects of your data/model; Test and evaluate your model.)</strong></p>
+
+<ol>
+  <li>The code generates at least 2 meaningful visualizations of the data, model, and/or outputs.</li>
+  <li>The visualizations have clear and appropriate labels and connections to the text.</li>
+  <li>The evaluation uses appropriate key metrics based on the proposed application and dataset.</li>
+  <li>The notebook accurately describes the effectiveness and limitations of the model on both training and test data in text and numbers.</li>
+  <li>The text explains the relationship between the effectiveness and limitations of the model and the proposed application.</li>
+</ol>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2026 Machine Learning Spring 2026 @ Olin College.</div>
+
+      </footer>
+    </div>
+
+    <script src="/assets/js/copyCode.js"></script>
+
+
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

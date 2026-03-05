@@ -1,0 +1,1309 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.17.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<script>
+class AnchorNoProxy extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._$a = null;
+  }
+  connectedCallback() {
+    const href = this.getAttribute("href") || "#";
+    if (this.dataset.hasOwnProperty('canvas')) {
+        const canvasURL = this.dataset.canvas;
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}" data-canvas="${canvasURL}"><slot></slot></a>`;
+    } else {
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}"><slot></slot></a>`;
+    }
+    this._$a = this.shadowRoot.querySelector("a");
+    this._$a.addEventListener("click", e => {
+      var url = this.getAttribute('href');
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+        window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+        window.open(url, '_blank');
+      }
+    });
+  }
+  static get observedAttributes() { return ["href"]; }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      if (this._$a === null) return;
+      this._$a.setAttribute("href", newValue);
+    }
+  }
+}
+
+customElements.define("a-no-proxy", AnchorNoProxy);
+
+class NoProxy extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+      	window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+      	window.open(this.href, '_blank');
+      }
+    });
+  }
+}
+
+customElements.define("no-proxy", NoProxy, { extends: "a" });
+
+class ConfirmLink extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      const result = confirm(`Are you sure you want to go to '${this.href}'?`);
+      if (!result) e.preventDefault();
+    });
+  }
+}
+
+customElements.define("confirm-link", ConfirmLink, { extends: "a" });
+
+</script>
+
+<!-- begin _includes/seo.html --><title>Assignment 2 - Machine Learning Spring 2026 @ Olin College</title>
+<meta name="description" content="Website">
+
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Machine Learning Spring 2026 @ Olin College">
+<meta property="og:title" content="Assignment 2">
+<meta property="og:url" content="/assignments/assignment02/assignment02.html">
+
+
+  <meta property="og:description" content="Website">
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="canonical" href="/assignments/assignment02/assignment02.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Machine Learning Spring 2026 @ Olin College Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  // Render Mermaid first, from untouched source.
+  mermaid.initialize({ startOnLoad: false });
+  await mermaid.run(); // renders all .mermaid blocks
+
+  // render KaTeX
+  renderMathInElement(document.body, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+    throwOnError: false,
+  });
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showSolutions = urlParams.get('showSolutions');
+    const showAllSolutions = urlParams.get('showAllSolutions');
+    const divs = document.querySelectorAll('button.togglebutton');
+
+    if (showSolutions == 'true') {
+        // Loop through the selected divs and manipulate them
+        divs.forEach(div => {
+            div.removeAttribute('hidden');
+        });
+    }
+
+    const solutionDivs = document.querySelectorAll('[id^=solution]');
+    const subpartSolutionDivs = document.querySelectorAll('[id^=subpartsolution]');
+
+    if (showAllSolutions == 'true') {
+        solutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+
+        subpartSolutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+    }
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<style>
+:root {
+    --box-bg-color: #fff; /* Default background color */
+}
+
+.homework-box {
+    background-color: var(--box-bg-color);
+    border: 2px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+}
+
+.homework-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.homework-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* Handle missing or empty src attribute */
+.homework-icon[src=""],
+.homework-icon:not([src]) {
+    content: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Games_for_Learning_%2827470%29_-_The_Noun_Project.svg');
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.homework-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.homework-content {
+    font-size: 16px;
+    color: #333;
+}
+</style>
+
+<style>
+.solution {
+    display: none; /* Hide solutions by default */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-left: 4px solid #007bff;
+    margin-top: 10px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.toggle-button.hide-solution {
+    background-color: #dc3545; /* Red background for hide button */
+}
+
+img.mermaid {
+     max-width:500px;
+     text-align: center;
+}
+
+</style>
+
+<div style="display:none;">
+$
+\newcommand{\mlvec}[1]{\mathbf{#1}}
+\newcommand{\mlmat}[1]{\mathbf{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\DeclareMathOperator*{\argmin}{arg\,min\,}
+$
+</div>
+
+  </head>
+
+  <body class="layout--problemset">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="https://qeacourse.github.io/RoboNinjaWarrior/website_graphics/olinlogo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Machine Learning Spring 2026 @ Olin College
+          
+        </a>
+        <ul class="visible-links"></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Assignment 2">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Assignment 2
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title"><i class="fas fa-file-alt"></i> On this page</h4></header>
+	      
+                <ul class="toc__menu">
+  <li><a href="#learning-objectives">Learning Objectives</a></li>
+  <li><a href="#supervised-learning-problem-setup">Supervised Learning Problem Setup</a></li>
+  <li><a href="#linear-regression-from-the-top-down">Linear Regression from the Top-Down</a></li>
+  <li><a href="#linear-regression-from-the-bottom-up">Linear Regression from the Bottom-Up</a></li>
+  <li><a href="#linear-regression-in-python">Linear Regression in Python</a></li>
+</ul>
+	      	
+            </nav>
+          </aside>
+        
+        <h1 id="learning-objectives">Learning Objectives</h1>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #C6EBD5;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-brain"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Learning Objectives</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<ul>
+  <li>Learn linear regression from three angles:
+    <ul>
+      <li>“top-down” (big picture, visual)</li>
+      <li>“bottom-up” (mathematical derivation)</li>
+      <li>computational (implementing in python)</li>
+    </ul>
+  </li>
+  <li>build python skills of dealing with data and writing functions</li>
+</ul>
+
+
+	</div>
+</div>
+
+<h1 id="supervised-learning-problem-setup">Supervised Learning Problem Setup</h1>
+
+<p>Suppose you are given a training set of data points, $(\mathbf{x_1}, y_1), (\mathbf{x}_2, y_2), \ldots, (\mathbf{x}_n, y_n)$ where each $\mathbf{x_i}$ represents an element of an input space (e.g., a d-dimensional feature vector) and each $y_i$ represents an element of an output space (e.g., a scalar target value).  We will consider $\mathbf{x_i}$ to be a row vector of size <code class="language-plaintext highlighter-rouge">1 x d</code>, representing each of the feature values for one sample/exemplar, as this will make our lives easier when we get more data points.  In the supervised learning setting, your goal is to determine a function $\hat{f}$ that maps from the input space to the output space.  For example, if we provide an input $\mathbf{x}$ to $\hat{f}$ it would generate the predicted output $\hat{y} = \hat{f}(\mathbf{x})$.</p>
+
+<p>We typically also assume that there is some loss function, $\ell$, that determines the amount of loss that a particular prediction $\hat{y_i}$ incurs due to a mismatch with the actual output $y_i$.  We can define the best possible model, $\hat{f}^\star$ as the one that minimizes these losses over the training set.  This notion can be expressed with the following equation  (note: that $\argmin$ in the equation below just means the value that minimizes the expression inside of the $\argmin$, e.g., $\argmin_{x} (x - 2)^2 = 2$, whereas $\min_{x} (x-2)^2 = 0$).</p>
+
+\[\begin{aligned}
+\hat{f}^\star &amp;= \argmin_{\hat{f}} \sum_{i=1}^n \ell \left ( \hat{f}(\mathbf{x_i}), y_i \right )
+\end{aligned}\]
+
+<h1 id="linear-regression-from-the-top-down">Linear Regression from the Top-Down</h1>
+
+<h2 id="motivation-why-learn-about-linear-regression">Motivation: Why Learn About Linear Regression?</h2>
+<p>Before we jump into the <em>what</em> of linear regression, let’s spend a little bit of time talking about the <em>why</em> of linear regression.  As you’ll soon see, linear regression is among the simplest (perhaps <em>the</em> simplest) machine learning algorithm.  It has many limitations, which you’ll also see, but also a of ton strengths.  <strong>First, it is a great place to start when learning about machine learning</strong> since the algorithm can be understood and implemented using a relatively small number of mathematical ideas (you’ll be reviewing these ideas later in this assignment).  In terms of the algorithm itself, it has the following very nice properties.</p>
+
+<ul>
+  <li><strong>Transparent:</strong> it’s pretty easy to examine the model and understand how it arrives at its predictions.</li>
+  <li><strong>Computationally tractable:</strong> models can be trained efficiently on datasets with large numbers of features and data points.</li>
+  <li><strong>Easy to implement:</strong> linear regression can be implemented using a number of different algorithms (e.g., gradient descent, closed-form solution).  Even if the algorithm is not built into your favorite numerical computation library, the algorithm can be implemented in only a couple of lines of code.</li>
+</ul>
+
+<p>For linear regression our input data, $\mathbf{x_i}$, are d-dimensional row vectors (each entry of these vectors can be thought of as a feature), our output data, $y_i$, are scalars, and our prediction functions, $\hat{f}$, are all of the form $\hat{f}(\mathbf{x}) =\mathbf{x} \cdot \mathbf{w} = \mathbf{x} \mathbf{w} = \sum_{i=1}^d x_i w_i$ for some vector of weights $\mathbf{w}$ (you could think of $\hat{f}$ as also taking $\mathbf{w}$ as an input, e.g., writing $\hat{f}(\mathbf{x}, \mathbf{w}$).  Most of the time we’ll leave $\mathbf{w}$ as an implicit input: writing $\hat{f}(\mathbf{x})$).</p>
+
+<p>In the function, $\hat{f}$, the elements of the vector $\mathbf{w}$ represent weights that multiply various dimensions (features) of the input.  For instance, if an element of $\mathbf{w}$ is high, that means that as the corresponding element of $\mathbf{x}$ increases, the prediction that $\hat{f}$ generates would also increase (you may want to mentally think through other cases, e.g., what would happen is the element of $\mathbf{x}$ decreases, or what would happen if the entry of $\mathbf{w}$ was large and negative).  The products of the weights and the features are then summed to arrive at an overall prediction.</p>
+
+<p>Given this model, we can now define our very first machine learning algorithm: <a href="https://en.wikipedia.org/wiki/Ordinary_least_squares">ordinary least squares</a> (OLS)!  In the ordinary least squares algorithm, we use our training set to select the $\mathbf{w}$ that minimizes the sum of squared differences between the model’s predictions and the training outputs.  Thinking back to the supervised learning problem setup, this corresponds to choosing $\ell(y, \hat{y}) = (y - \hat{y})^2$.
+Therefore, the OLS algorithm will use the training data to select the optimal value of $\mathbf{w}$ (called $\mathbf{w}^\star$), which minimizes the sum of squared differences between the model’s predictions and the training outputs.</p>
+
+\[\begin{aligned}
+\mathbf{w}^\star &amp;= \argmin_{\mathbf{w}} \sum_{i=1}^n \ell \left ( \hat{f}(\mathbf{x_i}, \mathbf{w}) , y_i \right) \\
+&amp;= \argmin_{\mathbf{w}} \sum_{i=1}^n \left ( \hat{f}(\mathbf{x_i}, \mathbf{w}) - y_i \right)^2 \\ 
+&amp;= \argmin_{\mathbf{w}} \sum_{i=1}^n \left ( \mathbf{x_i} \mathbf{w} - y_i \right)^2
+\end{aligned}\]
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #FDFD96;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fa fa-exclamation-triangle"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Notice</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<p>Digesting mathematical equations like this can be daunting, but your understanding will be increased by unpacking them carefully.  Make sure you understand what was substituted and why in each of these lines.  Make sure you understand what each symbol represents.  If you are confused, ask for help (e.g., post on Slack).</p>
+
+	</div>
+</div>
+
+<p>Below, we will talk about how to find $\mathbf{w}^\star$, for now we’ll just assume we have it.  With $\mathbf{w}^\star$, we can predict a value for a new input sample, $\mathbf{x_i}$, by predicting the corresponding (unknown) output, $y_i$, as $\hat{y_i} = \mathbf{x_i} \mathbf{w^\star}$. Because $\mathbf{x_i}$ is a row vector, this is equivalent to the dot product. At this point, we have used the training data to learn how to make predictions about unseen data, which is the hallmark of supervised machine learning!</p>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 1</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Draw a scatter plot in 2D (the x-axis is the independent variable and the y-axis is the dependent variable).  In other words, draw five or so data points, placed wherever you like. Next, draw a potential line of best fit, a straight line that is as close to your data points.  On the plot mark the vertical differences between the data points and the line (these differences are called the residuals).  Draw a second potential line of best fit and mark the residuals.  From the point of view of ordinary least-squares, which of these lines is better (i.e. has the smallest residuals)?</p>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-1&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-1" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<div style="text-align: center;">
+<img src="figures/exercise3solution.png" width="80%" />
+</div>
+<p>The red line (line 1) would be better since the residuals are generally smaller.  Line 2 also has several large residuals, which when squared will cause a large penalty for line 2.</p>
+
+     </div>
+</div>
+</div>
+</div>
+
+<h2 id="getting-a-feel-for-linear-regression">Getting a Feel for Linear Regression</h2>
+<p>In this class we’ll be learning about algorithms using both a top-down and a bottom-up approach.  By bottom-up we mean applying various mathematical rules to derive a solution to a problem and only then trying to understand how to apply it and how it well it might work for various problems.  By top-down we mean starting by applying the algorithm to various problems and through these applications gaining a sense of the algorithm’s properties.  We’ll start our investigation of linear regression using a <strong>top-down approach</strong>.</p>
+
+<h3 id="linear-regression-with-one-input-variable-line-of-best-fit">Linear Regression with One Input Variable: Line of Best Fit</h3>
+<p>If any of what we’ve said so far sounds familiar, it is likely because you have seen the idea of a line of best fit in some previous class.  To understand more intuitively what the OLS algorithm is doing, we want you to investigate its behavior when there is a single input variable (i.e., you are computing a line of best fit).</p>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 2</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Use the <a href="https://observablehq.com/@yizhe-ang/interactive-visualization-of-linear-regression">line of best fit online app</a> to create some datasets, guess the line of best fit, and then compare the results to the OLS solution (line of best fit).</p>
+
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>Examine the role that outliers play in determining the line of best fit.  Does OLS seem sensitive or insensitive to the presence of outliers in the data?</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-7&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-7" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>OLS is very sensitive to outliers.  A single outlier can change the slope of the line of best fit dramatically.  Here is an example of this phenomenon.</p>
+
+<div style="text-align: center;">
+<img src="figures/outlier.png" width="50%" />
+</div>
+
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>Were there any times when the line of best fit didn’t seem to really be “best” (e.g., it didn’t seem to capture the trends in the data)?</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-8&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-8" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>This could happen for many reasons.  If the dataset is pieceweise linear (e.g., composed of multiple line segments), if it has some other non-linear form (e.g., if it is quadratic), or if there are outliers.</p>
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<h1 id="linear-regression-from-the-bottom-up">Linear Regression from the Bottom-Up</h1>
+
+<p>Now that we’ve built a little intuition on linear regression, we’ll be diving into the mathematics of how to find the vector $\mathbf{w}^\star$ that best fits a particular training set.  The outline of the steps we are going to take to learn this are:</p>
+
+<ol>
+  <li>Solve the special case of linear regression with a single input ($d=1$, meaning a 1-dimensional feature vector).</li>
+  <li>Learn some mathematical tricks for manipulating matrices and vectors and computing gradients of functions involving matrices and vectors (these will be useful for solving the general case of linear regression).</li>
+  <li>Solve the general case of linear regression (where $d$ can be any positive, integer value).</li>
+</ol>
+
+<h2 id="linear-regression-with-one-variable">Linear regression with one variable</h2>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 3</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>Given a dataset $(x_1, y_1), (x_2, y_2), \ldots, (x_n, y_n)$ (where each $x_i$ and each $y_i$ is a scalar) and a potential value of $w$ (note that $w$ is a scalar in the case where $d=1$), write an expression for the sum of squared errors between the model predictions, $\hat{f}$, and the targets, $y_i$.  <strong>Note:</strong> In contrast to the line of best fit we saw above, here we are not computing a y-intercept (so we are effectively forcing the y-intercept to be $0$).  This choice may result in a worse fit, but it is easier to work out and helps build mathematical intuition.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-9&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-9" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\text{Sum of Squared Errors} = e(w) = \sum_{i=1}^n \left (  x_i w - y_i \right)^2~~  \\  \text{
+(note: we define error $e(w)$ for convenience)}\]
+
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>Compute the derivative of the expression for the sum of squared errors from part (a).</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-10&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-10" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\frac{de}{dw} &amp; = \sum_{i=1}^n 2 \left ( x_i w  - y_i \right)x_i   \\  
+&amp;= w \sum_{i=1}^n 2 x_i^2 - \sum_{i=1}^n 2 x_i y_i
+\end{aligned}\]
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part C</p>
+
+<p>Set the derivative to 0, and solve for $w^\star$.  $w^\star$ corresponds to a critical point of your sum of squared errors function.  Is this critical point a minimum, maximum, or neither? (here is a refresher on <a href="http://homes.sice.indiana.edu/donbyrd/Teach/M119WebPage/Finding+ClassifyingCriticalPoints.pdf">classifying critical points</a>).</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-11&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-11" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\frac{de}{dw} &amp;= 0 \\
+&amp;= w^\star \sum_{i=1}^n 2 x_i^2 - \sum_{i=1}^n 2 x_i y_i   \\
+\sum_{i=1}^n 2 x_i y_i  &amp;= w^\star \sum_{i=1}^n 2 x_i^2  \\  
+w^\star &amp;=\frac{\sum_{i=1}^n x_i y_i}{\sum_{i=1}^n x_i^2}
+\end{aligned}\]
+
+<p>If we take the second derivative of $e(w)$ we get:</p>
+
+\[\begin{aligned}
+\frac{d^2e}{dw^2} &amp;= \sum_{i=1}^n 2x_i^2 \enspace .
+\end{aligned}\]
+
+<p>We can see from the form of the second derivative that it is always non-negative, and therefore the critical point at $w^\star$ corresponds to a minimum.</p>
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<h2 id="reminder-of-mathematical-ideas">Reminder of mathematical ideas</h2>
+
+<p>In a previous assignment, we asked you to solidify your knowledge of three different mathematical concepts.  The box below summarizes what you were supposed to learn and provides the resources we provided to help you.</p>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #FFD1DC;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-external-link-alt"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">External Resources</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<ul>
+  <li>
+    <p>Vector-vector multiplication: Section 2.1 of <a href="https://see.stanford.edu/materials/aimlcs229/cs229-linalg.pdf">Zico Kolter’s Linear Algebra Review and
+Reference</a></p>
+  </li>
+  <li>Matrix-vector multiplication
+    <ul>
+      <li>Section 2.2 of <a href="https://see.stanford.edu/materials/aimlcs229/cs229-linalg.pdf">Zico Kolter’s Linear Algebra Review and
+Reference</a></li>
+      <li>The first bits of the Khan academy video on <a href="https://www.khanacademy.org/math/linear-algebra/matrix-transformations/linear-transformations/v/matrix-vector-products-as-linear-transformations">Linear
+Transformations</a></li>
+    </ul>
+  </li>
+  <li>Partial derivatives and gradients
+    <ul>
+      <li>Khan Academy videos on partial derivatives:
+<a href="https://www.khanacademy.org/math/multivariable-calculus/multivariable-derivatives/partial-derivatives/v/partial-derivatives-introduction">intro</a>,
+<a href="https://www.khanacademy.org/math/multivariable-calculus/multivariable-derivatives/partial-derivatives/v/partial-derivatives-and-graphs">graphical
+understanding</a>,
+and <a href="https://www.khanacademy.org/math/multivariable-calculus/multivariable-derivatives/partial-derivatives/v/formal-definition-of-partial-derivatives">formal
+definition</a></li>
+      <li><a href="https://www.khanacademy.org/math/multivariable-calculus/multivariable-derivatives/gradient-and-directional-derivatives/v/gradient">Khan Academy video on
+Gradient</a></li>
+    </ul>
+  </li>
+</ul>
+
+
+	</div>
+</div>
+
+<h2 id="building-our-bag-of-mathematical-tricks">Building our bag of mathematical tricks</h2>
+
+<p>The derivation of linear regression for the single variable case made use of your background from single variable calculus, and you used some rules for manipulating such functions.  When approaching linear regression with multiple variables, you have two choices.</p>
+
+<ol>
+  <li>You can apply the same bag of tricks you used for the single variable problem and only at the end convert things (necessarily) to a multivariable representation.</li>
+  <li>You can approach the whole problem from a multivariable perspective.</li>
+</ol>
+
+<p>This second approach requires that you learn some additional mathematical tricks, but once you learn these tricks, the derivation of linear regression is very straightforward.  The secondary benefit of this approach is that the new mathematical tricks you learn will apply to all sorts of other problems.</p>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 4</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>A quadratic form can be expressed in matrix-vector form as $\mathbf{x}^\top \mathbf{A} \mathbf{x}$.  Written this way, it looks very mysterious, but in this exercise you’ll build some intuition about what the expression represents. Further, it turns out that expressions like this show up in all sorts of places in machine learning.   To get a better understanding of what a quadratic form <em>is</em> (we’ll see what it’s good for later), watch this <a href="https://www.khanacademy.org/math/multivariable-calculus/applications-of-multivariable-derivatives/quadratic-approximations/v/expressing-a-quadratic-form-with-a-matrix">Khan Academy video</a>.</p>
+
+<p>After you’ve watched the Khan academy video, answer these questions.</p>
+
+<p>Note: This $\mathbf{x}$ is a generic column vector, not the $\mathbf{x_i}$ sample vector of features that we were talking about above. We are using the generic $\mathbf{x}$ here to align with the way most resources explain this form.</p>
+
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>Multiply out the expression \(\begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix}^\top \begin{bmatrix} a_{1,1} &amp; a_{1,2} &amp; a_{1,3} \\ a_{2,1} &amp; a_{2,2} &amp; a_{2,3} \\ a_{3,1} &amp; a_{3,2} &amp; a_{3,3} \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix}\).</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-12&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-12" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix}^\top \begin{bmatrix} a_{1,1} &amp; a_{1,2} &amp; a_{1,3} \\ a_{2,1} &amp; a_{2,2}
+&amp; a_{2,3} \\ a_{3,1} &amp; a_{3,2} &amp; a_{3,3} \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix} &amp;=  \begin{bmatrix} x_1 \\ x_2 \\ x_3 \end{bmatrix}^\top \begin{bmatrix} a_{1,1} x_1 + a_{1,2} x_2 + a_{1,3} x_3 \\ a_{2,1} x_1 + a_{2,2} x_2 + a_{2,3} x_3 \\ a_{3,1} x_1 + a_{3,2} x_2 + a_{3,3} x_3 \end{bmatrix}  \\
+&amp;= a_{1,1} x_1^2 + a_{1,2}x_1x_2 + a_{1,3} x_1 x_3 + a_{2,1}x_1 x_2 + a_{2,2} x_2^2  \nonumber \\
+&amp;+ a_{2,3} x_2 x_3 + a_{3,1} x_3 x_1 + a_{3,2} x_3 x_2 + a_{3,3} x_3^2
+\end{aligned}\]
+
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>Complete the following expression labeled (i) by filling in the part on the righthand side inside the nested summation.</p>
+
+<!-- This is commented out. -->
+<p>\(\begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_d \end{bmatrix}^\top\begin{bmatrix} a_{1,1} &amp; a_{1,2} &amp; \ldots
+&amp; a_{1,d}
+\\ a_{2,1} &amp; a_{2,2} &amp; \ldots &amp; a_{2,d} \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ a_{d,1} &amp; a_{d,2} &amp; \ldots &amp; a_{d,d}
+\end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_d \end{bmatrix} = \sum_{i=1}^d \sum_{j=1}^d \left (\text{your
+answer here} \right)\)</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-13&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-13" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_d \end{bmatrix}^\top \begin{bmatrix} a_{1,1} &amp; a_{1,2} &amp; \ldots &amp; a_{1,d} \\ a_{2,1} &amp; a_{2,2} &amp; \ldots &amp; a_{2,d} \\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\ a_{d,1} &amp; a_{d,2} &amp; \ldots &amp; a_{d,d} \end{bmatrix}\begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_d \end{bmatrix} &amp;= \begin{bmatrix} x_1 \\ x_2 \\ \vdots \\ x_d \end{bmatrix}^\top \begin{bmatrix} \sum_{j=1}^d a_{1,j} x_j \\ \sum_{j=1}^d a_{2,j} x_j  \\ \vdots \\ \sum_{j=1}^d a_{d,j} x_j \end{bmatrix}  \\   
+&amp;= \sum_{i=1}^d \sum_{j=1}^d a_{i,j}  x_i x_j
+\end{aligned}\]
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 5</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Matrix multiplication distributes over addition.  That is, $(\mathbf{A} + \mathbf{B}) (\mathbf{C} + \mathbf{D}) = \mathbf{A}\mathbf{C} + \mathbf{A}\mathbf{D} + \mathbf{B} \mathbf{C} + \mathbf{B} \mathbf{D}$.  Use this fact coupled with the fact that $\left(\mathbf{A} \mathbf{B} \right)^\top = \mathbf{B}^\top \mathbf{A}^\top$ to expand out the following expression.</p>
+
+\[\left ( \mathbf{A} \mathbf{x}  + \mathbf{y} \right )^\top \left (\mathbf{v} + \mathbf{u} \right)\]
+
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-5&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-5" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\left ( \mathbf{A} \mathbf{x}  + \mathbf{y} \right )^\top \left (\mathbf{v} + \mathbf{u} \right) = \mathbf{x}^\top \mathbf{A}^\top \mathbf{v} + \mathbf{x}^\top \mathbf{A}^\top \mathbf{u} + \mathbf{y}^\top \mathbf{v} + \mathbf{y}^\top \mathbf{u}\]
+
+
+     </div>
+</div>
+</div>
+</div>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 6</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>Using the definition of the gradient, show that $\nabla \mathbf{c}^\top \mathbf{x} = \mathbf{c}$ where the gradient is taken with respect to $\mathbf{x}$ and $\mathbf{c}$ is a vector of constants.</p>
+
+<p>If you want a hint, but not the full solution, you can click on the “solution” for the hint section below.
+Note: to read the hints, you need to have the version of the assignment open that has the <em>Show Solutions</em> button.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-14&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-14" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\mathbf{c}^\top \mathbf{x} &amp;= \sum_{j=1}^d c_j x_j  \\  
+\frac{\partial}{\partial x_i}  \sum_{j=1}^d c_j x_j  &amp;= c_i  \\  
+\nabla \mathbf{c}^\top \mathbf{x} &amp;= \mathbf{c}
+\end{aligned}\]
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part A hint</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-15&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-15" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>Start by writing out the multiplication in the summation form. Then think about the partial derivative with respect to some $i^{th}$ element of $\mathbf{x}$.</p>
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>Using the definition of the gradient, show that the $\nabla \mathbf{x}^\top \mathbf{A} \mathbf{x} = 2 \mathbf{A} \mathbf{x}$ where the gradient is taken with respect to $\mathbf{x}$, and $\mathbf{A}$ is a <code class="language-plaintext highlighter-rouge">symmetric</code> $dxd$ matrix of constants.</p>
+
+<p>Hint: utilize the fact that $\mathbf{x}^\top \mathbf{A} \mathbf{x} = \sum_{i=1}^d\sum_{j=1}^d x_i x_j a_{i, j}$.</p>
+
+<p>If you are stuck and want a hint, but not the full solution, you can click on the “solution” for the hint section below.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-16&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-16" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\mathbf{x}^\top \mathbf{A} \mathbf{x} =&amp; \sum_{i=1}^d\sum_{j=1}^d   x_i  x_j  a_{i, j} &amp;\nonumber  \\   
+\frac{\partial \mathbf{x}^\top \mathbf{A} \mathbf{x}}{\partial x_k} &amp;= \sum_{i=1}^d\sum_{j=1}^d   a_{i,j} \left ( \frac{\partial{x_i }}{\partial x_k} x_j  +  x_i \frac{\partial{x_j}}{\partial x_k} \right)  \text{    } \text{apply the  product rule} \nonumber   \\   
+ &amp;= \sum_{i=1}^d\sum_{j=1}^d   a_{i,j}  \frac{\partial{x_i }}{\partial x_k} x_j +   \sum_{i=1}^d\sum_{j=1}^d  a_{i,j}  x_i \frac{\partial{x_j}}{\partial x_k}  \text{      }\text{ split into two summations} \nonumber   \\   
+  &amp;= \sum_{j=1}^d   a_{k,j}  x_j +   \sum_{i=1}^d a_{i,k}  x_i  \text{      }\text{take partial derivatives, many terms are 0} \nonumber   \\   
+&amp;=  \sum_{j=1}^d   a_{k,j}  x_j +   \sum_{i=1}^d a_{k,i}  x_i  \text{      } \text{ since $\mathbf{A}$ is symmetric, $a_{i,j} = a_{j,i}$} \nonumber   \\   
+&amp;= 2  \sum_{j =1}^d a_{k,j}  x_j \text{      } \text{the two summations are the same} \nonumber   \\   
+&amp;= 2 \mathbf{row}_k^\top \mathbf{x} \text{         } \text{this is the dot product between $\mathbf{x}$ and the $k$th row of $\mathbf{A}$} \nonumber   \\   
+\nabla \mathbf{x}^\top \mathbf{A} \mathbf{x} &amp;= 2 \mathbf{A}\mathbf{x} \text{         }   \text{stacking up the partials gives this form} \nonumber
+\end{aligned}\]
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B hint</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-17&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-17" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>You can use the concepts in the first part of this exercise to expand things out to a summation.
+After a little work, you should reach something that looks like:
+\(\frac{\partial \mathbf{x}^\top \mathbf{A} \mathbf{x}}{\partial x_k} = \sum_{i=1}^d\sum_{j=1}^d   a_{i,j}  \frac{\partial{x_i }}{\partial x_k} x_j +   \sum_{i=1}^d\sum_{j=1}^d  a_{i,j}  x_i \frac{\partial{x_j}}{\partial x_k}\)
+Then, think about how you can simplify the iteration in the summation because of the terms that are zero.</p>
+
+</div>
+</div>
+
+
+</div>
+</div>
+
+<h2 id="linear-regression-with-multiple-variables">Linear Regression with Multiple Variables</h2>
+
+<div id="linearregmultiplevariables">
+
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 7</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Consider the case where $\mathbf{w}$ is a $d$-dimensional vector.  We will represent our $n$ training inputs as an 
+$n \times d$ matrix \(\mathbf{X} = \begin{bmatrix} \mathbf{x}_1 \\ \mathbf{x}_2 \\ \vdots \\ \mathbf{x}_n \end
+{bmatrix}\), where here we are again treating $\mathbf{x_i}$ as a row vector containing the $d$ features for a 
+single exemplar of our dataset. We will store our $n$ training outputs as an $n$-dimensional vector \(\mathbf{y} = 
+\begin{bmatrix} y_1 \\ y_2 \\ \vdots \\ y_n \end{bmatrix}\).</p>
+
+<p>In order to solve this problem, you’ll be leveraging some of the new mathematical tricks you picked up early in this assignment.  As you go through the derivation, make sure to treat vectors as first-class objects (e.g., work with the gradient instead of the individual partial derivatives).</p>
+
+<p style="font-size: x-large; font-weight: 700;">Part A</p>
+
+<p>Given $\mathbf{w}$, write an expression for the vector of predictions \(\mathbf{\hat{y}} = \begin{bmatrix} \hat{f}(\mathbf{x}_1) \\  \hat{f}(\mathbf{x}_2) \\  \vdots \\  \hat{f}(\mathbf{x}_n)\end{bmatrix}\) in terms of the training input matrix $\mathbf{X}$ (Hint: you should come up with something very simple).</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-18&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-18" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\mathbf{\hat{y}} = \begin{bmatrix} \mathbf{x_1}  \mathbf{w} \\ \mathbf{x_2} \mathbf{w} \\ \vdots \\ \mathbf{x_n} \mathbf{w} \end{bmatrix} = \mathbf{X} \mathbf{w}\]
+
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part B</p>
+
+<p>Write an expression for the sum of squared errors for the vector $\mathbf{w}$ on the training set in terms of $\mathbf{X}$, $\mathbf{y}$, and $\mathbf{w}$.  Hint: you will want to use the fact that $\sum_{i=1} v_i^2 = \mathbf{v} \cdot \mathbf{v} = \mathbf{v}^\top \mathbf{v}$.  Simplify your expression by distributing matrix multiplication over addition (don’t leave terms such as $\left (\mathbf{u} +\mathbf{v}  \right ) \left ( \mathbf{d} + \mathbf{c} \right)$ in your answer).</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-19&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-19" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\text{Sum of Squared Errors} &amp;= \sum_{i=1}^n \left ( \hat{y}_i - y_i \right)^2  \\  
+&amp;= \left (\mathbf{\hat y} - \mathbf{y} \right)^\top  \left (\mathbf{\hat y} - \mathbf{y} \right)  \\  
+&amp;=\left ( \mathbf{X} \mathbf{w} - \mathbf{y} \right)^\top  \left ( \mathbf{X} \mathbf{w} - \mathbf{y} \right)  \\  
+&amp;= \mathbf{w}^\top \mathbf{X}^\top \mathbf{X} \mathbf{w} - 2 \mathbf{w}^\top \mathbf{X}^\top \mathbf{y} + \mathbf{y}^\top \mathbf{y}
+\end{aligned}\]
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part C</p>
+
+<p>Compute the gradient of the sum of squared errors that you found in part (b) with respect to $\mathbf{w}$.  Make sure to use the results from the previous exercises to compute the gradients.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-20&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-20" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\nabla \text{Sum of Squared Errors}  &amp;= 2 \mathbf{X}^\top \mathbf{X} \mathbf{w} - 2 \mathbf{X}^\top \mathbf{y}
+\end{aligned}\]
+
+</div>
+</div>
+
+<p style="font-size: x-large; font-weight: 700;">Part D</p>
+
+<p>Set the gradient to 0, and solve for $\mathbf{w}$ (note: you can assume that $\mathbf{X}^\top \mathbf{X}$ is invertible).  This value of $\mathbf{w}$ corresponds to a critical point of your sum of squared errors function.  We will show in a later assignment that this critical point corresponds to a global minimum.  In other words, this value of $\mathbf{w}$ is guaranteed to drive the sum of squared errors as low as possible.</p>
+
+<p><button hidden="true" onclick="HideShowElement(&quot;subpartsolution-21&quot;)" class="togglebutton">Show / Hide Solution</button></p>
+
+<div id="subpartsolution-21" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+\[\begin{aligned}
+\nabla \text{Sum of Squared Errors}  &amp;= 0  \\  
+&amp;= 2 \mathbf{X}^\top \mathbf{X} \mathbf{w} - 2 \mathbf{X}^\top \mathbf{y}  \\  
+\mathbf{w} &amp;= \left ( \mathbf{X}^\top \mathbf{X} \right )^{-1} \mathbf{X}^\top \mathbf{y}
+\end{aligned}\]
+
+</div>
+</div>
+
+
+</div>
+</div>
+</div>
+
+<h1 id="linear-regression-in-python">Linear Regression in Python</h1>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 8</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Please note that this part is of non-trivial length (likely 2-5 hours).
+Work through the <a href="https://colab.research.google.com/drive/1dDbPLBwJes4vhWdmd8E5FBLrNN0oXHZo?usp=sharing">Assignment 2 Companion Notebook</a> to get some practice with <code class="language-plaintext highlighter-rouge">numpy</code> and explore linear regression using a top-down approach.  You can place your answers directly in the Jupyter notebook so that you have them for your records.</p>
+
+
+    <button hidden="true" onclick="HideShowElement(&quot;solution-8&quot;)" class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-8" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+<p>The solutions can be found directly in the notebook.</p>
+
+     </div>
+</div>
+</div>
+</div>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2026 Machine Learning Spring 2026 @ Olin College.</div>
+
+      </footer>
+    </div>
+
+    <script src="/assets/js/copyCode.js"></script>
+
+
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

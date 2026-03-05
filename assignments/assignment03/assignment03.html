@@ -1,0 +1,858 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.17.2 by Michael Rose
+  Copyright 2013-2019 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<script>
+class AnchorNoProxy extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" });
+    this._$a = null;
+  }
+  connectedCallback() {
+    const href = this.getAttribute("href") || "#";
+    if (this.dataset.hasOwnProperty('canvas')) {
+        const canvasURL = this.dataset.canvas;
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}" data-canvas="${canvasURL}"><slot></slot></a>`;
+    } else {
+        this.shadowRoot.innerHTML = `<style>a:hover, a:active { outline: 0; }\na { color: #5197ad; }\na:visited { color: #5197ad; }\na:hover { color: #266477; outline: 0; }</style><a href="${href}"><slot></slot></a>`;
+    }
+    this._$a = this.shadowRoot.querySelector("a");
+    this._$a.addEventListener("click", e => {
+      var url = this.getAttribute('href');
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+        window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+        window.open(url, '_blank');
+      }
+    });
+  }
+  static get observedAttributes() { return ["href"]; }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) {
+      if (this._$a === null) return;
+      this._$a.setAttribute("href", newValue);
+    }
+  }
+}
+
+customElements.define("a-no-proxy", AnchorNoProxy);
+
+class NoProxy extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      e.preventDefault();
+      if (document.referrer.startsWith('https://lms.hypothes.is') && this.dataset.hasOwnProperty('canvas')) {
+        // get rid of proxy if it was added
+        var n = this.dataset.canvas.search('https://olin.instructure.com');
+      	window.open(this.dataset.canvas.substring(n), '_blank');
+      } else {
+      	window.open(this.href, '_blank');
+      }
+    });
+  }
+}
+
+customElements.define("no-proxy", NoProxy, { extends: "a" });
+
+class ConfirmLink extends HTMLAnchorElement {
+  connectedCallback() {
+    this.addEventListener("click", e => {
+      const result = confirm(`Are you sure you want to go to '${this.href}'?`);
+      if (!result) e.preventDefault();
+    });
+  }
+}
+
+customElements.define("confirm-link", ConfirmLink, { extends: "a" });
+
+</script>
+
+<!-- begin _includes/seo.html --><title>Assignment 3 - Machine Learning Spring 2026 @ Olin College</title>
+<meta name="description" content="Website">
+
+
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Machine Learning Spring 2026 @ Olin College">
+<meta property="og:title" content="Assignment 3">
+<meta property="og:url" content="/assignments/assignment03/assignment03.html">
+
+
+  <meta property="og:description" content="Website">
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="canonical" href="/assignments/assignment03/assignment03.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": null,
+      "url": "/"
+    
+  }
+</script>
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Machine Learning Spring 2026 @ Olin College Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <!-- start custom head snippets -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.9.0/dist/mermaid.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css" integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js" integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  // Render Mermaid first, from untouched source.
+  mermaid.initialize({ startOnLoad: false });
+  await mermaid.run(); // renders all .mermaid blocks
+
+  // render KaTeX
+  renderMathInElement(document.body, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+    throwOnError: false,
+  });
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<!-- insert favicons. use https://realfavicongenerator.net/ -->
+
+<!-- end custom head snippets -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" rel="stylesheet">
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showSolutions = urlParams.get('showSolutions');
+    const showAllSolutions = urlParams.get('showAllSolutions');
+    const divs = document.querySelectorAll('button.togglebutton');
+
+    if (showSolutions == 'true') {
+        // Loop through the selected divs and manipulate them
+        divs.forEach(div => {
+            div.removeAttribute('hidden');
+        });
+    }
+
+    const solutionDivs = document.querySelectorAll('[id^=solution]');
+    const subpartSolutionDivs = document.querySelectorAll('[id^=subpartsolution]');
+
+    if (showAllSolutions == 'true') {
+        solutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+
+        subpartSolutionDivs.forEach(div => {
+            console.log('test')
+            div.style.display = 'block';
+        });
+    }
+});
+</script>
+
+<script type="text/javascript">
+function HideShowElement(divID) {
+    const x = document.getElementById(divID);
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+}
+</script>
+<style>
+:root {
+    --box-bg-color: #fff; /* Default background color */
+}
+
+.homework-box {
+    background-color: var(--box-bg-color);
+    border: 2px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    width: 300px;
+}
+
+.homework-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.homework-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+/* Handle missing or empty src attribute */
+.homework-icon[src=""],
+.homework-icon:not([src]) {
+    content: url('https://upload.wikimedia.org/wikipedia/commons/a/ab/Games_for_Learning_%2827470%29_-_The_Noun_Project.svg');
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.homework-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.homework-content {
+    font-size: 16px;
+    color: #333;
+}
+</style>
+
+<style>
+.solution {
+    display: none; /* Hide solutions by default */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-left: 4px solid #007bff;
+    margin-top: 10px;
+}
+
+.toggle-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.toggle-button.hide-solution {
+    background-color: #dc3545; /* Red background for hide button */
+}
+
+img.mermaid {
+     max-width:500px;
+     text-align: center;
+}
+
+</style>
+
+<div style="display:none;">
+$
+\newcommand{\mlvec}[1]{\mathbf{#1}}
+\newcommand{\mlmat}[1]{\mathbf{#1}}
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\DeclareMathOperator*{\argmin}{arg\,min\,}
+$
+</div>
+
+  </head>
+
+  <body class="layout--problemset">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+          <a class="site-logo" href="/"><img src="https://qeacourse.github.io/RoboNinjaWarrior/website_graphics/olinlogo.png" alt=""></a>
+        
+        <a class="site-title" href="/">
+          Machine Learning Spring 2026 @ Olin College
+          
+        </a>
+        <ul class="visible-links"></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Assignment 3">
+    
+    
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Assignment 3
+</h1>
+          
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+          <aside class="sidebar__right sticky">
+            <nav class="toc">
+              <header><h4 class="nav__title">
+<i class="fas fa-file-alt"></i> On this page</h4></header>
+	      
+                <ul class="toc__menu">
+  <li><a href="#learning-objectives">Learning Objectives</a></li>
+  <li><a href="#human-centered-design-in-machine-learning">Human-Centered Design in Machine Learning</a></li>
+  <li><a href="#the-echominds-design-process">The EchoMinds Design Process</a></li>
+  <li><a href="#deep-dive-into-human-centered-design-activity">Deep Dive into Human-Centered Design Activity</a></li>
+</ul>
+	      	
+            </nav>
+          </aside>
+        
+        <h1 id="learning-objectives">Learning Objectives</h1>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #C6EBD5;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fas fa-brain"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Learning Objectives</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<ul>
+  <li>Understand how human-centered design ideas can play a role in developing machine learning-powered technologies.</li>
+  <li>Get some practice mapping interviews onto design insights.</li>
+  <li>Learn about retrieval metrics for retrival tasks.</li>
+</ul>
+
+	</div>
+</div>
+
+<h1 id="human-centered-design-in-machine-learning">Human-Centered Design in Machine Learning</h1>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 1</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Before we engage in detail with the design process that led to the creation of the EchoMinds app, we’d like to 
+establish some shared concepts around human-centered design.  We know that not everyone has taken CD at Olin, so 
+please read this <a href="https://www.uxdesigninstitute.com/blog/what-is-human-centered-design/">short article on human-centered design</a> and respond to the following prompts.</p>
+<ul>
+  <li>How is the human-centered design process different from a classical design process?</li>
+  <li>What do you think are the benefits of human-centered design?  What are the drawbacks?</li>
+</ul>
+
+
+    <button hidden="true" onclick='HideShowElement("solution-1")' class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-1" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 2</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>The article in the previous exercise gives us a 6-phase design process consisting of observation, ideation, rapid 
+prototyping, user feedback, iteration, and implementation.  Choose a particular area where machine learning 
+technology might be able to solve a set or problems.  For example, you might start with a particular people group 
+(e.g., college students) or setting (e.g., factories).  Sketch out how the human-centered design process might play 
+out in this scenario.  For each phase, list some of the main activities you would do and what you would hope to 
+learn from them.  From doing this exercise, what are the most important specifics to keep in mind when applying 
+human-centered design to machine learning?</p>
+
+
+    <button hidden="true" onclick='HideShowElement("solution-2")' class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-2" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+<h1 id="the-echominds-design-process">The EchoMinds Design Process</h1>
+
+<p>We will be using the EchoMinds App as a throughline in this course.  Now that you’ve thought 
+about the idea of using human-centered design in the process of creating machine learning-powered technology, we want 
+you to engage with the specifics of the EchoMinds design process.  As you engage, we invite you to consider what you liked 
+about what the team did, and, potentially, what you would have done differently.</p>
+
+<p>These were the major activities and phases of the team’s design process.</p>
+
+<div class="tip" style="
+    border-left: 6px solid #000000;
+    margin: 2em 2em 2em 2em;">
+	<div style="background-color: #FDFD96;
+	                column-gap: 1rem;
+					display: flex;
+					padding: 1em 1em 1em 1em;">
+	<div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #000000;">
+        <i class="fa fa-exclamation-triangle"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Notice</div>
+	</div>
+	<div style="padding: 1em 1em 1em 1em;">
+	   
+<p>We have included links to many of the raw materials the students engaged with over the summer.  We do not expect you 
+to look at these raw materials directly.  If you are curious, they are there for your review.</p>
+
+	</div>
+</div>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 3</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Please categorize the major activities of the summer team with respect to the human-centered design steps of 
+observation, ideation, rapid prototyping, user feedback, iteration, and implementation.  For each activity, comment 
+on how the particular activity fit with the chosen stage of the design process (e.g., what might the important 
+takeaways be from this activity to advance the design?).  What aspects of the design process seem beneficial and you 
+might emulate?  What would you change (either specifics of an activity or adding new activities all together)?</p>
+
+
+    <button hidden="true" onclick='HideShowElement("solution-3")' class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-3" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+<h2 id="activity-1-orientation">Activity 1: Orientation</h2>
+<p>During the first two weeks of the summer, students engaged in the following activities.</p>
+<ul>
+  <li>Listening to a presentation about their summer project (high-level goals, specific plans, research 
+questions)</li>
+  <li>Listening to a presentation on key concepts in disability justice</li>
+  <li><a href="/assignments/assignment03/supplementary_files/seeing_ai_activity.pptx">Exploring with the Seeing AI app</a></li>
+  <li>Students practiced doing <a href="https://en.wikipedia.org/wiki/Field_research">fieldwork</a> at a local senior center (here is a document summarizing <a href="/assignments/assignment03/supplementary_files/fieldworktips.pdf">key things to keep</a>
+in mind when doing field work)</li>
+</ul>
+
+<p><img src="/assignments/assignment03/supplementary_files/theheights.png" alt="Olin students posing for a group picture with seniors at a Needham senior center"></p>
+
+<ul>
+  <li>Students listened to a presentation on <a href="https://olincollege.com/:v:/s/EducateAI/IQDVehDbmW6qRK9aO41k3e31Aar8-5fweQDj-vmOZRyYIFo?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&amp;e=7qMB27">blindness education at the Carroll Center</a>
+sharepoint (the <a href="https://carroll.org/">Carroll Center</a> was their primary fieldwork site).</li>
+  <li>Brian Switzer (of the Carroll Center) gave a presentation on access technology for people who are blind.  This 
+presentation covered digital access (e.g., screen readers) as well as emerging tools (e.g., large language 
+models for visual interpretation).</li>
+  <li>Brian Charlson (formerly of the Carroll Center) and his sister Lesli Charlson gave a demonstration of how a 
+person who is blind cooks (Brian is blind).  Brian will be with us next class.</li>
+</ul>
+
+<p><img alt="Brian Charlson and Lesli Charlson cooking.  Brian is holding a large knife and about to chop a pineapple" src="supplementary_files/briancooking.png" width="70%"></p>
+
+<ul>
+  <li>Students volunteered at a fundraiser for the Carroll Center called Walk for Independence.  They helped run booths, 
+direct cars into parking spaces, and worked as sighted guides for the participants in the walkathon.</li>
+</ul>
+
+<p><img src="/assignments/assignment03/supplementary_files/walkforindependence.jpg" alt="Three college students serving as volunteers at the Walk for Independence.  The picture is taken on a large lawn."></p>
+
+<ul>
+  <li>
+    <p>Students learned how to interview people when doing fieldwork.  They practiced by interviewing people from the 
+Olin community (<a href="/assignments/assignment03/supplementary_files/interview_tips.pptx">Interview tips</a>)</p>
+  </li>
+  <li>Students did secondary source research on employment for people who are blind (as that was the major topic area 
+for the summer work)
+    <ul>
+      <li><a href="https://www.youtube.com/watch?v=06CzR7ebX_Y">Working Blind series</a></li>
+      <li><a href="https://www.youtube.com/watch?v=-Ik6tmtCuHQ">Blind and Disabled - My Job Search/Employment Experience</a></li>
+      <li><a href="https://www.youtube.com/watch?v=tnoT04ea-XE">Cayla: Job Hunting while legally blind (part 2)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=5vYhrhNkaXw">Where The Blind Work: Remote Work</a></li>
+    </ul>
+  </li>
+  <li>Students listened to a presentation on <a href="/assignments/assignment03/supplementary_files/designjustice.pptx">Design Justice</a>
+</li>
+</ul>
+
+<h2 id="activity-2-initial-fieldwork">Activity 2: Initial Fieldwork</h2>
+
+<p>Students spent six hours per day at the Carroll Center for the Blind or Massachusetts Association for the Blind and 
+Visually Impaired (MABVI).  They were there to observe clients of the Carroll Center receiving training on how to 
+live life with vision loss, do design activities to understand the opportunity space, and volunteer to help Carroll 
+Center personnel with other projects.</p>
+
+<p><img src="supplementary_files/carroll_01.png" width="45%" alt="a man working with a laptop at the Carroll Center">
+<img src="supplementary_files/carroll_02.png" width="45%" alt="a student works with a woman who is using her computer at the Carroll Center"></p>
+
+<p>Sample schedule for a fieldwork day:</p>
+<ul>
+  <li>Morning Housekeeping (10:00 AM-10:30 AM), Tech Center Room 105</li>
+  <li>Third period (10:35 AM-11:20 AM): Personal Management: Main Building, Personal Management Library</li>
+  <li>Fourth period (11:30 AM-12:15 PM): Rehab Services: Tech Center Conference Room 208</li>
+  <li>Lunch (12:15 PM-1:15 PM)</li>
+  <li>Fifth period (1:15 PM-2:00 PM): Information Access: Main Building, Stalls</li>
+  <li>Sixth period (2:10 PM-2:55 PM): Low vision: Main Building, Low Vision Clinic on second floor</li>
+  <li>Debrief (3:00 PM-3:30 PM, Tech Center, Room 105)</li>
+</ul>
+
+<h2 id="activity-3-ideation">Activity 3: Ideation</h2>
+
+<p>The team used their insights from their initial field work to come up with many ideas for how machine learning 
+technology could play a role in some aspect of employment for people who are blind.  These ideas were refined to a 
+short list that were explored in the next phase.</p>
+
+<h2 id="activity-4-design-activities">Activity 4: Design Activities</h2>
+
+<p>Students downselected to three major idea categories.</p>
+<ol>
+  <li>Machine learning-powered resume builder that would help create a visually appealing and tailored resume for a 
+particular job posting.</li>
+  <li>A machine learning-powered screen reader that would orient people on how to use a website non-visually and also 
+describe any images or icons that did not have alt text.</li>
+  <li>A machine learning-powered notetaking app that would allow people to take notes and retrieve them easily by using 
+machine learning technology to find the most similar note given a query.</li>
+</ol>
+
+<p>Students developed design activities to test these three concepts with community partners.  These design activities 
+used low-fidelity prototyping tools and role playing to allow an opportunity space to be explored quickly without 
+actually building the underlying system.</p>
+<ul>
+  <li><a href="/assignments/assignment03/supplementary_files/AI_resume_builder.docx">AI resume builder design activity</a></li>
+  <li><a href="/assignments/assignment03/supplementary_files/voice_memo_roleplay.docx">Voice memo roleplay</a></li>
+  <li><a href="/assignments/assignment03/supplementary_files/BlurbBot.docx">BlurbBot</a></li>
+</ul>
+
+<h2 id="activity-5-prototyping">Activity 5: Prototyping</h2>
+
+<p>Students decided to pursue the machine learning-powered notetaking app (now called EchoMinds).  Students worked to 
+create an initial prototype on iOS that connected to a backend server running a text similarity model based on the 
+<code class="language-plaintext highlighter-rouge">sentence_transformers</code> Python library.  We’ll be exploring the implementation of EchoMinds later in the course.</p>
+
+<h2 id="activity-6-internal-testing">Activity 6: Internal Testing</h2>
+
+<p>Students ran <a href="/assignments/assignment03/supplementary_files/internal_testing.docx">an internal test</a> where members of the research team tried to use the 
+prototype for a notetaking task.The testing uncovered some key issues with how notes were managed within the app.</p>
+
+<p>In the initial prototype, users took notes in a large text box.  Behind the scenes, each separate line of text was 
+turned into a note that could be retrieved through a note search.  Since users did not understand the granularity 
+that their notes were being analyzed, the lines of text in their notes were often short and hard to understand 
+without the surrounding context.  This caused the app to not perform well.</p>
+
+<h2 id="activity-7-notetaking-survey">Activity 7: Notetaking Survey</h2>
+
+<p>Students ran <a href="https://docs.google.com/forms/d/e/1FAIpQLSf3tFNsU-HY29oG7dZGE-MluGpmZ1qX7EoYGmr7fzh10nOrzg/viewform?usp=publish-editor">a survey to understand in what contexts people who are blind take notes</a>.</p>
+
+<h2 id="activity-8-refining-prototype">Activity 8: Refining Prototype</h2>
+
+<p>Students refined the prototype based on the feedback from the internal testing.  This resulted in the following user 
+experience (in reality the interface was iterated upon with feedback from community partners).</p>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/VP8x9vU41O8?si=gptcNdATaxBannOu" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen=""></iframe>
+
+<h2 id="activity-9-testing-with-community-partners">Activity 9: Testing With Community Partners</h2>
+
+<p>Students performed a final (for the summer) evaluation of EchoMinds.  Testing was done with students at the Carroll 
+Center for the blind, students at Olin, employees at Carroll Center for the Blind, and employees at MABVI.</p>
+
+<p>As an example, here is the script for the final testing activity at the <a href="/assignments/assignment03/supplementary_files/ccb_final_test.docx">Carroll Center for the Blind</a>.</p>
+
+<p>We’ll get into evaluation a lot more in the next assignment.</p>
+
+<h1 id="deep-dive-into-human-centered-design-activity">Deep Dive into Human-Centered Design Activity</h1>
+
+<div style="display: normal;
+        border-left: 6px solid #0065B4;
+        margin: 2em 0em 2em 0em;">
+    <div class="tip" style="background-color: #ECF7FF;
+        padding: 1em 1em 1em 1em;
+        display: flex;
+        column-gap: 1rem;">
+        <div class="notice-bulb" style="
+	    font-family: 'Font Awesome 5 Free',serif;
+	    vertical-align: middle;
+	    font-weight: 900;
+	    font-size: xx-large;
+	    color: #ff6f00;">
+            <i class="fas fa-question"></i>
+</div>
+	<div style="font-size: xx-large; font-weight: 900;">Exercise 4</div>
+    </div>
+<div style="display: normal; padding: 1em 1em 1em 1em;">
+	
+<p>Please listen to <a href="/assignments/assignment03/supplementary_files/ashley_interview.mp3">this interview</a> that Bela and Ethan did with Ashley, an employee at the Massachusetts Association 
+for the Blind and Visually Impaired (MABVI).  The goal of this interview was to get to know our community partners 
+and to understand how they interact with technology in general and machine learning (or AI) specifically.  What are 
+your key takeaways from this interview?  You could focus on important insights regarding Ashley’s use of AI, design 
+insights that should be kept in mind when ideating on project directions, how the interview was conducted (what did you like, how might you do it differently), whether the interview seemed valuable 
+to the overall design process, etc.</p>
+
+
+    <button hidden="true" onclick='HideShowElement("solution-4")' class="togglebutton">Show / Hide Solution</button>
+
+<div id="solution-4" class="solution" style="
+    background-color: #cefad0;
+    border-left: 6px solid #6500B4;
+    padding: 1em 1em 1em 1em;
+    display: none;
+    column-gap: 2rem;
+    margin: 2em 2em 2em 2em;">
+    <div style="display: normal">
+<p style="font-weight: 900; font-size: x-large">Solution</p>
+
+
+     </div>
+</div>
+</div>
+</div>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">© 2026 Machine Learning Spring 2026 @ Olin College.</div>
+
+      </footer>
+    </div>
+
+    <script src="/assets/js/copyCode.js"></script>
+
+
+  <script src="/assets/js/main.min.js"></script>
+  <script src="https://kit.fontawesome.com/4eee35f757.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>
